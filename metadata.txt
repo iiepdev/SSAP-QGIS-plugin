@@ -1,0 +1,47 @@
+# This file contains metadata for your plugin.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=Sprague Multipliers
+qgisMinimumVersion=3.0
+description=This plugin generates school-aged population for any polygon layer
+version=0.1
+author=IIEP-UNESCO
+email=development@iiep.unesco.org
+
+about=This algorithm aims at creating single years of age for any level of administrative boundaries or any other polygon layer, based on clustered 5-year age group raster files, by applying Sprague multipliers. It also allows the user to reconstruct the different school age groups for a particular country, regardless of whether the system divides lower and upper secondary or not.
+
+tracker=http://bugs
+repository=http://repo
+# End of mandatory metadata
+
+# Recommended items:
+
+hasProcessingProvider=yes
+# Uncomment the following line and add your changelog:
+# changelog=
+
+# Tags are comma separated with spaces allowed
+tags=raster, processing, vector, polygon, calculator
+
+homepage=http://homepage
+category=Analysis
+icon=icon.png
+# experimental flag
+experimental=True
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+
+# Since QGIS 3.8, a comma separated list of plugins to be installed
+# (or upgraded) can be specified.
+# Check the documentation for more information.
+# plugin_dependencies=
+
+Category of the plugin: Raster, Vector, Database or Web
+# category=
+
+# If the plugin can run on QGIS Server.
+server=False
+
