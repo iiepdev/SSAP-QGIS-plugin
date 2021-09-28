@@ -1047,19 +1047,6 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
 
-        
-##        Preprimarystartingage = parameters['Preprimarystartingage']
-##        Preprimaryduration = parameters['Preprimaryduration']
-##        Primarystartingage = parameters['Primarystartingage']
-##        Primaryduration = parameters['Primaryduration']
-##        Lowersecondarystartingage = parameters['Lowersecondarystartingage']
-##        Lowersecondaryduration = parameters['Lowersecondaryduration']
-##        Uppersecondarystartingage = parameters['Uppersecondarystartingage']
-##        Uppersecondaryduration = parameters['Uppersecondaryduration']
-##        Secondarystartingage = parameters['Secondarystartingage']
-##        Secondaryduration = parameters['Secondaryduration']
-        
-
         if parameters['Createcustomschoolagegroups']==True & parameters['SystemdividedinLowerandUppersecondary']==False:
 
             # Calculating school ages with Secondary
@@ -1132,6 +1119,32 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             
 
         if parameters['Createcustomschoolagegroups']==True & parameters['SystemdividedinLowerandUppersecondary']==True:
+
+            pre_primary_starting_age = parameters['Preprimarystartingage']
+            pre_primary_duration = parameters['Preprimaryduration']
+            primary_starting_age = parameters['Primarystartingage']
+            primary_duration = parameters['Primaryduration']
+            lower_secondary_starting_age = parameters['Lowersecondarystartingage']
+            lower_secondary_duration = parameters['Lowersecondaryduration']
+            upper_secondary_starting_age = parameters['Uppersecondarystartingage']
+            upper_secondary_duration = parameters['Uppersecondaryduration']
+
+            def _sum_fields(prefix, start, duration):
+                """ create expression: _sum_fields("F", 6, 2) would return "Y_F_6 + Y_F_7" """
+                return " + ".join(f"Y_{prefix}_{i}" for i in range(start, start + duration))
+
+            expr_pre_primary_f = _sum_fields("F", pre_primary_starting_age, pre_primary_duration)
+            expr_pre_primary_m = _sum_fields("M", pre_primary_starting_age, pre_primary_duration)
+            expr_pre_primary_t = _sum_fields("T", pre_primary_starting_age, pre_primary_duration)
+            expr_primary_f = _sum_fields("F", primary_starting_age, primary_duration)
+            expr_primary_m = _sum_fields("M", primary_starting_age, primary_duration)
+            expr_primary_t = _sum_fields("T", primary_starting_age, primary_duration)
+            expr_lower_secondary_f = _sum_fields("F", lower_secondary_starting_age, lower_secondary_duration)
+            expr_lower_secondary_m = _sum_fields("M", lower_secondary_starting_age, lower_secondary_duration)
+            expr_lower_secondary_t = _sum_fields("T", lower_secondary_starting_age, lower_secondary_duration)
+            expr_upper_secondary_f = _sum_fields("F", upper_secondary_starting_age, upper_secondary_duration)
+            expr_upper_secondary_m = _sum_fields("M", upper_secondary_starting_age, upper_secondary_duration)
+            expr_upper_secondary_t = _sum_fields("T", upper_secondary_starting_age, upper_secondary_duration)
 
             # Calculating school ages with Lower and Upper secondary
             alg_params = {
@@ -1225,18 +1238,19 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                                    {'expression': '\"Y_T_27\"','length': 0,'name': 'Y_T_27','precision': 0,'type': 6},
                                    {'expression': '\"Y_T_28\"','length': 0,'name': 'Y_T_28','precision': 0,'type': 6},
                                    {'expression': '\"Y_T_29\"','length': 0,'name': 'Y_T_29','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Preprimarystartingage ,        Preprimarystartingage + Preprimaryduration - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Pre_primary_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Preprimarystartingage ,        Preprimarystartingage + Preprimaryduration - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Pre_primary_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Preprimarystartingage ,        Preprimarystartingage + Preprimaryduration - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Pre_primary_T','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Primarystartingage  ,          Primarystartingage  +  Primaryduration  - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Primary_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Primarystartingage ,           Primarystartingage + Primaryduration - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Primary_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Primarystartingage ,           Primarystartingage + Primaryduration - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Primary_T','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Lowersecondarystartingage  ,   Lowersecondarystartingage + Lowersecondaryduration  - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'LowSec_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Lowersecondarystartingage  ,   Lowersecondarystartingage + Lowersecondaryduration  - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'LowSec_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Lowersecondarystartingage  ,   Lowersecondarystartingage + Lowersecondaryduration  - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'LowSec_T','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Uppersecondarystartingage   ,  Uppersecondarystartingage + Uppersecondaryduration   - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'UppSec_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Uppersecondarystartingage   ,  Uppersecondarystartingage + Uppersecondaryduration   - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'UppSec_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Uppersecondarystartingage   ,  Uppersecondarystartingage + Uppersecondaryduration   - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'UppSec_T','precision': 0,'type': 6}],
+                                   { 'expression': expr_pre_primary_f, 'length': 0, 'name': 'Pre_primary_F', 'precision': 0, 'type': 6},
+                                   { 'expression': expr_pre_primary_m, 'length': 0, 'name': 'Pre_primary_M', 'precision': 0, 'type': 6},
+                                   { 'expression': expr_pre_primary_t, 'length': 0, 'name': 'Pre_primary_T', 'precision': 0, 'type': 6},
+                                   { 'expression': expr_primary_f, 'length': 0, 'name': 'Primary_F', 'precision': 0, 'type': 6},
+                                   { 'expression': expr_primary_m, 'length': 0, 'name': 'Primary_M', 'precision': 0, 'type': 6},
+                                   { 'expression': expr_primary_t, 'length': 0, 'name': 'Primary_T', 'precision': 0, 'type': 6},
+                                   { 'expression': expr_lower_secondary_f, 'length': 0, 'name': 'LowSec_F', 'precision': 0, 'type': 6},
+                                   { 'expression': expr_lower_secondary_m, 'length': 0, 'name': 'LowSec_M', 'precision': 0, 'type': 6},
+                                   { 'expression': expr_lower_secondary_t, 'length': 0, 'name': 'LowSec_T', 'precision': 0, 'type': 6},
+                                   { 'expression': expr_upper_secondary_f, 'length': 0, 'name': 'UppSec_F', 'precision': 0, 'type': 6},
+                                   { 'expression': expr_upper_secondary_m, 'length': 0, 'name': 'UppSec_M', 'precision': 0, 'type': 6},
+                                   { 'expression': expr_upper_secondary_t, 'length': 0, 'name': 'UppSec_T', 'precision': 0, 'type': 6},
+                                   ],
                 'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
