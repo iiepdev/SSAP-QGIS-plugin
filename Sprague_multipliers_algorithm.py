@@ -145,7 +145,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterBoolean(
                 'Createcustomschoolagegroups',
                 'Create custom school age groups',
-                defaultValue=False
+                defaultValue=True
             )
         )
 
@@ -264,7 +264,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         )
         param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
-
+        
         # Secondary starting age
         param = QgsProcessingParameterNumber(
             'Secondarystartingage',
@@ -278,7 +278,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
 
-        # Secondary duration        
+        # Secondary duration
         param = QgsProcessingParameterNumber(
             'Secondaryduration',
             'Secondary duration',
@@ -306,16 +306,35 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
     def processAlgorithm(self, parameters, context, model_feedback):
         # Use a multi-step feedback, so that individual child algorithm progress reports are adjusted for the
         # overall progress through the model
-        feedback = QgsProcessingMultiStepFeedback(43, model_feedback)
+        feedback = QgsProcessingMultiStepFeedback(45, model_feedback)
         results = {}
         outputs = {}
+
+        ISOCountryCode = self.parameterAsString(parameters, 'ISOcountrycode', context)
+        Year = self.parameterAsInt(parameters, 'Year', context)
+        UseConstrainedPopulationEstimates = self.parameterAsBool(parameters, 'Useconstrainedpopulationestimates', context)
+        UseUNAdjustedConstrainedPopulationEstimates = self.parameterAsBool(parameters, 'UseUNadjustedconstrainedestimates', context)
+        CreateCustomAgeGroups = self.parameterAsBool(parameters, 'Createcustomschoolagegroups', context)
+        DivideLowerUpperSecondary = self.parameterAsBool(parameters, 'SystemdividedinLowerandUppersecondary', context)
+        Preprimarystartingage = self.parameterAsInt(parameters, 'Preprimarystartingage', context)
+        Preprimaryduration = self.parameterAsInt(parameters, 'Preprimaryduration', context)
+        Primarystartingage = self.parameterAsInt(parameters, 'Primarystartingage', context)
+        Primaryduration = self.parameterAsInt(parameters, 'Primaryduration', context)
+        Lowersecondarystartingage = self.parameterAsInt(parameters, 'Lowersecondarystartingage', context)
+        Lowersecondaryduration = self.parameterAsInt(parameters, 'Lowersecondaryduration', context)
+        Uppersecondarystartingage = self.parameterAsInt(parameters, 'Uppersecondarystartingage', context)
+        Uppersecondaryduration = self.parameterAsInt(parameters, 'Uppersecondaryduration', context)
+        Secondarystartingage = self.parameterAsInt(parameters, 'Secondarystartingage', context)
+        Secondaryduration = self.parameterAsInt(parameters, 'Secondaryduration', context)
+        Foldercontainingtherasterfiles = self.parameterAsString(parameters, 'Foldercontainingtherasterfiles', context)
+        
 
         # Female 0 to 1
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterFemale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterFemale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterFemale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'F_0_',
@@ -334,9 +353,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Female 1 to 4
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterFemale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_1_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterFemale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_1_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterFemale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_1_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'F_1_',
@@ -372,9 +391,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Female 5 to 9
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterFemale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_5_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterFemale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_5_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterFemale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_5_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'F_5_',
@@ -392,9 +411,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Female 10 to 14
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterFemale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_10_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterFemale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_10_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterFemale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_10_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'F_10_',
@@ -412,9 +431,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Female 15 to 19
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterFemale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_15_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterFemale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_15_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterFemale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_15_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'F_15_',
@@ -432,9 +451,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Female 20 to 24
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterFemale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_20_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterFemale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_20_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterFemale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_20_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'F_20_',
@@ -452,9 +471,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Female 25 to 29
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterFemale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_25_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterFemale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_25_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterFemale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_25_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'F_25_',
@@ -472,9 +491,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Female 30 to 34
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterFemale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_30_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterFemale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_30_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterFemale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_30_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'F_30_',
@@ -492,9 +511,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Female 35 to 39
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterFemale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_35_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterFemale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_35_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterFemale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_35_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'F_35_',
@@ -512,9 +531,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Male 0 to 1
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterMale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_0_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterMale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_0_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterMale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_0_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'M_0_',
@@ -532,9 +551,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Male 1 to 4
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterMale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_1_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterMale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_1_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterMale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_1_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'M_1_',
@@ -552,9 +571,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Male 5 to 9
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterMale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_5_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterMale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_5_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterMale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_5_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'M_5_',
@@ -572,9 +591,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Male 10 to 14
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterMale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_10_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterMale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_10_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterMale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_10_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'M_10_',
@@ -592,9 +611,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Male 15 to 19
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterMale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_15_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterMale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_15_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterMale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_15_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'M_15_',
@@ -612,9 +631,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Male 20 to 24
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterMale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_20_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterMale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_20_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterMale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_20_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'M_20_',
@@ -632,9 +651,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Male 25 to 29
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterMale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_25_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterMale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_25_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterMale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_25_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'M_25_',
@@ -652,9 +671,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Male 30 to 34
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterMale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_30_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterMale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_30_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterMale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_30_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'M_30_',
@@ -672,9 +691,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Male 35 to 39
         if parameters['Useconstrainedpopulationestimates'] == False:
             RasterMale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_35_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == False:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
             RasterMale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_35_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True & parameters['UseUNadjustedconstrainedestimates'] == True:
+        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
             RasterMale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_35_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         alg_params = {
             'COLUMN_PREFIX': 'M_35_',
@@ -721,6 +740,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'INPUT': outputs['CreatingThe0To4AgeGroups']['OUTPUT']
         }
         outputs['CreateSpatialIndexSection0'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        
 
         feedback.setCurrentStep(22)
         if feedback.isCanceled():
@@ -1047,30 +1067,131 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
 
-        
-##        Preprimarystartingage = parameters['Preprimarystartingage']
-##        Preprimaryduration = parameters['Preprimaryduration']
-##        Primarystartingage = parameters['Primarystartingage']
-##        Primaryduration = parameters['Primaryduration']
-##        Lowersecondarystartingage = parameters['Lowersecondarystartingage']
-##        Lowersecondaryduration = parameters['Lowersecondaryduration']
-##        Uppersecondarystartingage = parameters['Uppersecondarystartingage']
-##        Uppersecondaryduration = parameters['Uppersecondaryduration']
-##        Secondarystartingage = parameters['Secondarystartingage']
-##        Secondaryduration = parameters['Secondaryduration']
-        
 
-        if parameters['Createcustomschoolagegroups']==True & parameters['SystemdividedinLowerandUppersecondary']==False:
+        # Random points in extent
+        alg_params = {
+            'EXTENT': '1.000000000,1.000000000,1.000000000,1.000000000',
+            'MAX_ATTEMPTS': 200,
+            'MIN_DISTANCE': 0,
+            'POINTS_NUMBER': 1,
+            'TARGET_CRS': 'ProjectCrs',
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['RandomPointsInExtent'] = processing.run('native:randompointsinextent', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+        feedback.setCurrentStep(5)
+        if feedback.isCanceled():
+            return {}
+      
+        if parameters['Createcustomschoolagegroups']==True and parameters['SystemdividedinLowerandUppersecondary']==False:
 
             # Calculating school ages with Secondary
             alg_params = {
-                'FIELDS_MAPPING': [{'expression': '\"Y_M_0\"','length': 0,'name': 'Y_M_0','precision': 0,'type': 6},{'expression': '\"Y_M_1\"','length': 0,'name': 'Y_M_1','precision': 0,'type': 6},{'expression': '\"Y_M_2\"','length': 0,'name': 'Y_M_2','precision': 0,'type': 6},{'expression': '\"Y_M_3\"','length': 0,'name': 'Y_M_3','precision': 0,'type': 6},{'expression': '\"Y_M_4\"','length': 0,'name': 'Y_M_4','precision': 0,'type': 6},{'expression': '\"Y_M_5\"','length': 0,'name': 'Y_M_5','precision': 0,'type': 6},{'expression': '\"Y_M_6\"','length': 0,'name': 'Y_M_6','precision': 0,'type': 6},{'expression': '\"Y_M_7\"','length': 0,'name': 'Y_M_7','precision': 0,'type': 6},{'expression': '\"Y_M_8\"','length': 0,'name': 'Y_M_8','precision': 0,'type': 6},{'expression': '\"Y_M_9\"','length': 0,'name': 'Y_M_9','precision': 0,'type': 6},{'expression': '\"Y_M_10\"','length': 0,'name': 'Y_M_10','precision': 0,'type': 6},{'expression': '\"Y_M_11\"','length': 0,'name': 'Y_M_11','precision': 0,'type': 6},{'expression': '\"Y_M_12\"','length': 0,'name': 'Y_M_12','precision': 0,'type': 6},{'expression': '\"Y_M_13\"','length': 0,'name': 'Y_M_13','precision': 0,'type': 6},{'expression': '\"Y_M_14\"','length': 0,'name': 'Y_M_14','precision': 0,'type': 6},{'expression': '\"Y_M_15\"','length': 0,'name': 'Y_M_15','precision': 0,'type': 6},{'expression': '\"Y_M_16\"','length': 0,'name': 'Y_M_16','precision': 0,'type': 6},{'expression': '\"Y_M_17\"','length': 0,'name': 'Y_M_17','precision': 0,'type': 6},{'expression': '\"Y_M_18\"','length': 0,'name': 'Y_M_18','precision': 0,'type': 6},{'expression': '\"Y_M_19\"','length': 0,'name': 'Y_M_19','precision': 0,'type': 6},{'expression': '\"Y_M_20\"','length': 0,'name': 'Y_M_20','precision': 0,'type': 6},{'expression': '\"Y_M_21\"','length': 0,'name': 'Y_M_21','precision': 0,'type': 6},{'expression': '\"Y_M_22\"','length': 0,'name': 'Y_M_22','precision': 0,'type': 6},{'expression': '\"Y_M_23\"','length': 0,'name': 'Y_M_23','precision': 0,'type': 6},{'expression': '\"Y_M_24\"','length': 0,'name': 'Y_M_24','precision': 0,'type': 6},{'expression': '\"Y_M_25\"','length': 0,'name': 'Y_M_25','precision': 0,'type': 6},{'expression': '\"Y_M_26\"','length': 0,'name': 'Y_M_26','precision': 0,'type': 6},{'expression': '\"Y_M_27\"','length': 0,'name': 'Y_M_27','precision': 0,'type': 6},{'expression': '\"Y_M_28\"','length': 0,'name': 'Y_M_28','precision': 0,'type': 6},{'expression': '\"Y_M_29\"','length': 0,'name': 'Y_M_29','precision': 0,'type': 6},{'expression': '\"Y_F_0\"','length': 0,'name': 'Y_F_0','precision': 0,'type': 6},{'expression': '\"Y_F_1\"','length': 0,'name': 'Y_F_1','precision': 0,'type': 6},{'expression': '\"Y_F_2\"','length': 0,'name': 'Y_F_2','precision': 0,'type': 6},{'expression': '\"Y_F_3\"','length': 0,'name': 'Y_F_3','precision': 0,'type': 6},{'expression': '\"Y_F_4\"','length': 0,'name': 'Y_F_4','precision': 0,'type': 6},{'expression': '\"Y_F_5\"','length': 0,'name': 'Y_F_5','precision': 0,'type': 6},{'expression': '\"Y_F_6\"','length': 0,'name': 'Y_F_6','precision': 0,'type': 6},{'expression': '\"Y_F_7\"','length': 0,'name': 'Y_F_7','precision': 0,'type': 6},{'expression': '\"Y_F_8\"','length': 0,'name': 'Y_F_8','precision': 0,'type': 6},{'expression': '\"Y_F_9\"','length': 0,'name': 'Y_F_9','precision': 0,'type': 6},{'expression': '\"Y_F_10\"','length': 0,'name': 'Y_F_10','precision': 0,'type': 6},{'expression': '\"Y_F_11\"','length': 0,'name': 'Y_F_11','precision': 0,'type': 6},{'expression': '\"Y_F_12\"','length': 0,'name': 'Y_F_12','precision': 0,'type': 6},{'expression': '\"Y_F_13\"','length': 0,'name': 'Y_F_13','precision': 0,'type': 6},{'expression': '\"Y_F_14\"','length': 0,'name': 'Y_F_14','precision': 0,'type': 6},{'expression': '\"Y_F_15\"','length': 0,'name': 'Y_F_15','precision': 0,'type': 6},{'expression': '\"Y_F_16\"','length': 0,'name': 'Y_F_16','precision': 0,'type': 6},{'expression': '\"Y_F_17\"','length': 0,'name': 'Y_F_17','precision': 0,'type': 6},{'expression': '\"Y_F_18\"','length': 0,'name': 'Y_F_18','precision': 0,'type': 6},{'expression': '\"Y_F_19\"','length': 0,'name': 'Y_F_19','precision': 0,'type': 6},{'expression': '\"Y_F_20\"','length': 0,'name': 'Y_F_20','precision': 0,'type': 6},{'expression': '\"Y_F_21\"','length': 0,'name': 'Y_F_21','precision': 0,'type': 6},{'expression': '\"Y_F_22\"','length': 0,'name': 'Y_F_22','precision': 0,'type': 6},{'expression': '\"Y_F_23\"','length': 0,'name': 'Y_F_23','precision': 0,'type': 6},{'expression': '\"Y_F_24\"','length': 0,'name': 'Y_F_24','precision': 0,'type': 6},{'expression': '\"Y_F_25\"','length': 0,'name': 'Y_F_25','precision': 0,'type': 6},{'expression': '\"Y_F_26\"','length': 0,'name': 'Y_F_26','precision': 0,'type': 6},{'expression': '\"Y_F_27\"','length': 0,'name': 'Y_F_27','precision': 0,'type': 6},{'expression': '\"Y_F_28\"','length': 0,'name': 'Y_F_28','precision': 0,'type': 6},{'expression': '\"Y_F_29\"','length': 0,'name': 'Y_F_29','precision': 0,'type': 6},{'expression': '\"Y_T_0\"','length': 0,'name': 'Y_T_0','precision': 0,'type': 6},{'expression': '\"Y_T_1\"','length': 0,'name': 'Y_T_1','precision': 0,'type': 6},{'expression': '\"Y_T_2\"','length': 0,'name': 'Y_T_2','precision': 0,'type': 6},{'expression': '\"Y_T_3\"','length': 0,'name': 'Y_T_3','precision': 0,'type': 6},{'expression': '\"Y_T_4\"','length': 0,'name': 'Y_T_4','precision': 0,'type': 6},{'expression': '\"Y_T_5\"','length': 0,'name': 'Y_T_5','precision': 0,'type': 6},{'expression': '\"Y_T_6\"','length': 0,'name': 'Y_T_6','precision': 0,'type': 6},{'expression': '\"Y_T_7\"','length': 0,'name': 'Y_T_7','precision': 0,'type': 6},{'expression': '\"Y_T_8\"','length': 0,'name': 'Y_T_8','precision': 0,'type': 6},{'expression': '\"Y_T_9\"','length': 0,'name': 'Y_T_9','precision': 0,'type': 6},{'expression': '\"Y_T_10\"','length': 0,'name': 'Y_T_10','precision': 0,'type': 6},{'expression': '\"Y_T_11\"','length': 0,'name': 'Y_T_11','precision': 0,'type': 6},{'expression': '\"Y_T_12\"','length': 0,'name': 'Y_T_12','precision': 0,'type': 6},{'expression': '\"Y_T_13\"','length': 0,'name': 'Y_T_13','precision': 0,'type': 6},{'expression': '\"Y_T_14\"','length': 0,'name': 'Y_T_14','precision': 0,'type': 6},{'expression': '\"Y_T_15\"','length': 0,'name': 'Y_T_15','precision': 0,'type': 6},{'expression': '\"Y_T_16\"','length': 0,'name': 'Y_T_16','precision': 0,'type': 6},{'expression': '\"Y_T_17\"','length': 0,'name': 'Y_T_17','precision': 0,'type': 6},{'expression': '\"Y_T_18\"','length': 0,'name': 'Y_T_18','precision': 0,'type': 6},{'expression': '\"Y_T_19\"','length': 0,'name': 'Y_T_19','precision': 0,'type': 6},{'expression': '\"Y_T_20\"','length': 0,'name': 'Y_T_20','precision': 0,'type': 6},{'expression': '\"Y_T_21\"','length': 0,'name': 'Y_T_21','precision': 0,'type': 6},{'expression': '\"Y_T_22\"','length': 0,'name': 'Y_T_22','precision': 0,'type': 6},{'expression': '\"Y_T_23\"','length': 0,'name': 'Y_T_23','precision': 0,'type': 6},{'expression': '\"Y_T_24\"','length': 0,'name': 'Y_T_24','precision': 0,'type': 6},{'expression': '\"Y_T_25\"','length': 0,'name': 'Y_T_25','precision': 0,'type': 6},{'expression': '\"Y_T_26\"','length': 0,'name': 'Y_T_26','precision': 0,'type': 6},{'expression': '\"Y_T_27\"','length': 0,'name': 'Y_T_27','precision': 0,'type': 6},{'expression': '\"Y_T_28\"','length': 0,'name': 'Y_T_28','precision': 0,'type': 6},{'expression': '\"Y_T_29\"','length': 0,'name': 'Y_T_29','precision': 0,'type': 6},{'expression': 'eval(array_to_string(array_foreach(generate_series( @Preprimarystartingage ,  @Preprimarystartingage + @Preprimaryduration - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Pre_primary_F','precision': 0,'type': 6},{'expression': 'eval(array_to_string(array_foreach(generate_series( @Preprimarystartingage ,  @Preprimarystartingage + @Preprimaryduration - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Pre_primary_M','precision': 0,'type': 6},{'expression': 'eval(array_to_string(array_foreach(generate_series( @Preprimarystartingage ,  @Preprimarystartingage + @Preprimaryduration - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Pre_primary_T','precision': 0,'type': 6},{'expression': 'eval(array_to_string(array_foreach(generate_series(  @Primarystartingage  ,   @Primarystartingage  +  @Primaryduration  - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Primary_F','precision': 0,'type': 6},{'expression': 'eval(array_to_string(array_foreach(generate_series( @Primarystartingage ,  @Primarystartingage + @Primaryduration - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Primary_M','precision': 0,'type': 6},{'expression': 'eval(array_to_string(array_foreach(generate_series( @Primarystartingage ,  @Primarystartingage + @Primaryduration - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Primary_T','precision': 0,'type': 6},{'expression': 'eval(array_to_string(array_foreach(generate_series(    @Secondarystartingage    ,     @Secondarystartingage + @Secondaryduration    - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Sec_F','precision': 0,'type': 6},{'expression': 'eval(array_to_string(array_foreach(generate_series(    @Secondarystartingage    ,     @Secondarystartingage + @Secondaryduration    - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Sec_M','precision': 0,'type': 6},{'expression': 'eval(array_to_string(array_foreach(generate_series(    @Secondarystartingage    ,     @Secondarystartingage + @Secondaryduration    - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Sec_T','precision': 0,'type': 6}],
+                'FIELDS_MAPPING': [{'expression': '\"Y_M_0\"','length': 0,'name': 'Y_M_0','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_1\"','length': 0,'name': 'Y_M_1','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_2\"','length': 0,'name': 'Y_M_2','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_3\"','length': 0,'name': 'Y_M_3','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_4\"','length': 0,'name': 'Y_M_4','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_5\"','length': 0,'name': 'Y_M_5','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_6\"','length': 0,'name': 'Y_M_6','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_7\"','length': 0,'name': 'Y_M_7','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_8\"','length': 0,'name': 'Y_M_8','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_9\"','length': 0,'name': 'Y_M_9','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_10\"','length': 0,'name': 'Y_M_10','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_11\"','length': 0,'name': 'Y_M_11','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_12\"','length': 0,'name': 'Y_M_12','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_13\"','length': 0,'name': 'Y_M_13','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_14\"','length': 0,'name': 'Y_M_14','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_15\"','length': 0,'name': 'Y_M_15','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_16\"','length': 0,'name': 'Y_M_16','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_17\"','length': 0,'name': 'Y_M_17','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_18\"','length': 0,'name': 'Y_M_18','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_19\"','length': 0,'name': 'Y_M_19','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_20\"','length': 0,'name': 'Y_M_20','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_21\"','length': 0,'name': 'Y_M_21','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_22\"','length': 0,'name': 'Y_M_22','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_23\"','length': 0,'name': 'Y_M_23','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_24\"','length': 0,'name': 'Y_M_24','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_25\"','length': 0,'name': 'Y_M_25','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_26\"','length': 0,'name': 'Y_M_26','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_27\"','length': 0,'name': 'Y_M_27','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_28\"','length': 0,'name': 'Y_M_28','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_29\"','length': 0,'name': 'Y_M_29','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_0\"','length': 0,'name': 'Y_F_0','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_1\"','length': 0,'name': 'Y_F_1','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_2\"','length': 0,'name': 'Y_F_2','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_3\"','length': 0,'name': 'Y_F_3','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_4\"','length': 0,'name': 'Y_F_4','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_5\"','length': 0,'name': 'Y_F_5','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_6\"','length': 0,'name': 'Y_F_6','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_7\"','length': 0,'name': 'Y_F_7','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_8\"','length': 0,'name': 'Y_F_8','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_9\"','length': 0,'name': 'Y_F_9','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_10\"','length': 0,'name': 'Y_F_10','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_11\"','length': 0,'name': 'Y_F_11','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_12\"','length': 0,'name': 'Y_F_12','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_13\"','length': 0,'name': 'Y_F_13','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_14\"','length': 0,'name': 'Y_F_14','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_15\"','length': 0,'name': 'Y_F_15','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_16\"','length': 0,'name': 'Y_F_16','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_17\"','length': 0,'name': 'Y_F_17','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_18\"','length': 0,'name': 'Y_F_18','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_19\"','length': 0,'name': 'Y_F_19','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_20\"','length': 0,'name': 'Y_F_20','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_21\"','length': 0,'name': 'Y_F_21','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_22\"','length': 0,'name': 'Y_F_22','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_23\"','length': 0,'name': 'Y_F_23','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_24\"','length': 0,'name': 'Y_F_24','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_25\"','length': 0,'name': 'Y_F_25','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_26\"','length': 0,'name': 'Y_F_26','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_27\"','length': 0,'name': 'Y_F_27','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_28\"','length': 0,'name': 'Y_F_28','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_29\"','length': 0,'name': 'Y_F_29','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_0\"','length': 0,'name': 'Y_T_0','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_1\"','length': 0,'name': 'Y_T_1','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_2\"','length': 0,'name': 'Y_T_2','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_3\"','length': 0,'name': 'Y_T_3','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_4\"','length': 0,'name': 'Y_T_4','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_5\"','length': 0,'name': 'Y_T_5','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_6\"','length': 0,'name': 'Y_T_6','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_7\"','length': 0,'name': 'Y_T_7','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_8\"','length': 0,'name': 'Y_T_8','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_9\"','length': 0,'name': 'Y_T_9','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_10\"','length': 0,'name': 'Y_T_10','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_11\"','length': 0,'name': 'Y_T_11','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_12\"','length': 0,'name': 'Y_T_12','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_13\"','length': 0,'name': 'Y_T_13','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_14\"','length': 0,'name': 'Y_T_14','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_15\"','length': 0,'name': 'Y_T_15','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_16\"','length': 0,'name': 'Y_T_16','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_17\"','length': 0,'name': 'Y_T_17','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_18\"','length': 0,'name': 'Y_T_18','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_19\"','length': 0,'name': 'Y_T_19','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_20\"','length': 0,'name': 'Y_T_20','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_21\"','length': 0,'name': 'Y_T_21','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_22\"','length': 0,'name': 'Y_T_22','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_23\"','length': 0,'name': 'Y_T_23','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_24\"','length': 0,'name': 'Y_T_24','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_25\"','length': 0,'name': 'Y_T_25','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_26\"','length': 0,'name': 'Y_T_26','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_27\"','length': 0,'name': 'Y_T_27','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_28\"','length': 0,'name': 'Y_T_28','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_29\"','length': 0,'name': 'Y_T_29','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_F','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_M','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_T','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_F','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_M','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_T','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Secondarystartingage, Secondaryduration, Secondarystartingage),'length': 0,'name': 'Sec_F','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Secondarystartingage, Secondaryduration, Secondarystartingage),'length': 0,'name': 'Sec_M','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Secondarystartingage, Secondaryduration, Secondarystartingage),'length': 0,'name': 'Sec_T','precision': 0,'type': 6}],
                 'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
             outputs['CalculatingSchoolAgesWithSecondary'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-            feedback.setCurrentStep(33)
+            
+            feedback.setCurrentStep(34)
             if feedback.isCanceled():
                 return {}
 
@@ -1080,7 +1201,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             }
             outputs['CreateSpatialIndexForSecondary'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-            feedback.setCurrentStep(34)
+            feedback.setCurrentStep(35)
             if feedback.isCanceled():
                 return {}
 
@@ -1093,45 +1214,72 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                 'METHOD': 1,
                 'PREDICATE': [2],
                 'PREFIX': '',
-                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+                'OUTPUT': parameters['Results']
             }
             outputs['CreatingTheFileShapefileSecondary'] = processing.run('native:joinattributesbylocation', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-            feedback.setCurrentStep(35)
-            if feedback.isCanceled():
-                return {}
-
-            # Exporting the results to Excel
-            alg_params = {
-                'DATASOURCE_OPTIONS': '',
-                'INPUT': outputs['CreatingTheFileShapefileSecondary']['OUTPUT'],
-                'LAYER_NAME': '',
-                'LAYER_OPTIONS': '',
-                'OUTPUT': QgsExpression('@Foldercontainingtherasterfiles || \'/\' || \'Population_estimates_\' ||  lower(@ISOcountrycode)  || to_string( @Year ) || \'SchoolAge\' || \'.xlsx\'').evaluate(),
-                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-            }
-            outputs['ExportingTheResultsToExcel'] = processing.run('native:savefeatures', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            results['Results'] = outputs['CreatingTheFileShapefileSecondary']['OUTPUT']
 
             feedback.setCurrentStep(36)
             if feedback.isCanceled():
                 return {}
 
-            # Drop field(s)
+            # Exporting the results to Excel
+            ExportResultsToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "SchoolAge.xlsx"
             alg_params = {
-                'COLUMN': ['fid'],
+                'DATASOURCE_OPTIONS': '',
                 'INPUT': outputs['CreatingTheFileShapefileSecondary']['OUTPUT'],
-                'OUTPUT': parameters['Results']
+                'LAYER_NAME': '',
+                'LAYER_OPTIONS': '',
+                'OUTPUT': ExportResultsToExcel,
+                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
-            outputs['DropFields'] = processing.run('qgis:deletecolumn', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            results['Results'] = outputs['DropFields']['OUTPUT']
-            
+            outputs['ExportingTheResultsToExcel'] = processing.run('native:savefeatures', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
             feedback.setCurrentStep(37)
             if feedback.isCanceled():
                 return {}
 
-            
 
-        if parameters['Createcustomschoolagegroups']==True & parameters['SystemdividedinLowerandUppersecondary']==True:
+            # Preparing the table to export the parameters - Secondary
+            alg_params = {
+                'FIELDS_MAPPING': [{'expression': parameters['ISOcountrycode'].lower(),'length': 10,'name': 'ISO country code','precision': 0,'type': 10},
+                                   {'expression': Year,'length': 0,'name': 'Year','precision': 0,'type': 2},
+                                   {'expression': Preprimarystartingage,'length': 0,'name': 'Pre-primary starting age','precision': 0,'type': 2},
+                                   {'expression': Preprimaryduration,'length': 0,'name': 'Pre-primary duration','precision': 0,'type': 2},
+                                   {'expression': Primarystartingage,'length': 0,'name': 'Primary starting age','precision': 0,'type': 2},
+                                   {'expression': Primaryduration,'length': 0,'name': 'Primary duration','precision': 0,'type': 2},
+                                   {'expression': Lowersecondarystartingage,'length': 0,'name': 'Lower secondary starting age','precision': 0,'type': 2},
+                                   {'expression': Lowersecondaryduration,'length': 0,'name': 'Lower secondary duration','precision': 0,'type': 2},
+                                   {'expression': Uppersecondarystartingage,'length': 0,'name': 'Upper secondary starting age','precision': 0,'type': 2},
+                                   {'expression': Uppersecondaryduration,'length': 0,'name': 'Upper secondary duration','precision': 0,'type': 2}],
+                'INPUT': outputs['RandomPointsInExtent']['OUTPUT'],
+                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+            }
+            outputs['PreparingTheTableToExportTheParametersSecondary'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+            feedback.setCurrentStep(39)
+            if feedback.isCanceled():
+                return {}
+
+
+            # Export to spreadsheet
+            ExportParametersToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "Parameters.xlsx"
+            alg_params = {
+                'FORMATTED_VALUES': False,
+                'LAYERS': outputs['PreparingTheTableToExportTheParametersSecondary']['OUTPUT'],
+                'OUTPUT': ExportParametersToExcel,
+                'OVERWRITE': False,
+                'USE_ALIAS': False
+            }
+            outputs['ExportToSpreadsheet'] = processing.run('native:exporttospreadsheet', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+            feedback.setCurrentStep(40)
+            if feedback.isCanceled():
+                return {}
+
+
+
+        if parameters['Createcustomschoolagegroups']==True and parameters['SystemdividedinLowerandUppersecondary']==True:
 
             # Calculating school ages with Lower and Upper secondary
             alg_params = {
@@ -1225,24 +1373,24 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                                    {'expression': '\"Y_T_27\"','length': 0,'name': 'Y_T_27','precision': 0,'type': 6},
                                    {'expression': '\"Y_T_28\"','length': 0,'name': 'Y_T_28','precision': 0,'type': 6},
                                    {'expression': '\"Y_T_29\"','length': 0,'name': 'Y_T_29','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Preprimarystartingage ,        Preprimarystartingage + Preprimaryduration - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Pre_primary_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Preprimarystartingage ,        Preprimarystartingage + Preprimaryduration - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Pre_primary_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Preprimarystartingage ,        Preprimarystartingage + Preprimaryduration - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Pre_primary_T','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Primarystartingage  ,          Primarystartingage  +  Primaryduration  - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Primary_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Primarystartingage ,           Primarystartingage + Primaryduration - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Primary_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Primarystartingage ,           Primarystartingage + Primaryduration - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'Primary_T','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Lowersecondarystartingage  ,   Lowersecondarystartingage + Lowersecondaryduration  - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'LowSec_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Lowersecondarystartingage  ,   Lowersecondarystartingage + Lowersecondaryduration  - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'LowSec_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Lowersecondarystartingage  ,   Lowersecondarystartingage + Lowersecondaryduration  - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'LowSec_T','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Uppersecondarystartingage   ,  Uppersecondarystartingage + Uppersecondaryduration   - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'UppSec_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Uppersecondarystartingage   ,  Uppersecondarystartingage + Uppersecondaryduration   - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'UppSec_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( Uppersecondarystartingage   ,  Uppersecondarystartingage + Uppersecondaryduration   - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))','length': 0,'name': 'UppSec_T','precision': 0,'type': 6}],
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_F','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_M','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_T','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_F','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_M','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_T','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_F','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_M','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_T','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_F','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_M','precision': 0,'type': 6},
+                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_T','precision': 0,'type': 6}],
                 'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
             outputs['CalculatingSchoolAgesWithLowerAndUpperSecondary'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-            feedback.setCurrentStep(33)
+            feedback.setCurrentStep(34)
             if feedback.isCanceled():
                 return {}
 
@@ -1252,7 +1400,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             }
             outputs['CreateSpatialIndexForLowerAndUpperSecondary'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-            feedback.setCurrentStep(34)
+            feedback.setCurrentStep(35)
             if feedback.isCanceled():
                 return {}
 
@@ -1265,39 +1413,63 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                 'METHOD': 1,
                 'PREDICATE': [2],
                 'PREFIX': '',
-                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+                'OUTPUT': parameters['Results']
             }
             outputs['CreatingTheFileShapefileLowerAndUpperSecondary'] = processing.run('native:joinattributesbylocation', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-            feedback.setCurrentStep(35)
-            if feedback.isCanceled():
-                return {}
-
-            # Exporting the results to Excel
-            alg_params = {
-                'DATASOURCE_OPTIONS': '',
-                'INPUT': outputs['CreatingTheFileShapefileLowerAndUpperSecondary']['OUTPUT'],
-                'LAYER_NAME': '',
-                'LAYER_OPTIONS': '',
-                'OUTPUT': QgsExpression('@Foldercontainingtherasterfiles || \'/\' || \'Population_estimates_\' ||  lower(@ISOcountrycode)  || to_string( @Year ) || \'SchoolAge\' || \'.xlsx\'').evaluate(),
-                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-            }
-            outputs['ExportingTheResultsToExcel'] = processing.run('native:savefeatures', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            results['Results'] = outputs['CreatingTheFileShapefileLowerAndUpperSecondary']['OUTPUT']
 
             feedback.setCurrentStep(36)
             if feedback.isCanceled():
                 return {}
 
-            # Drop field(s)
+            # Exporting the results to Excel
+            ExportResultsToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "SchoolAge.xlsx"
             alg_params = {
-                'COLUMN': ['fid'],
+                'DATASOURCE_OPTIONS': '',
                 'INPUT': outputs['CreatingTheFileShapefileLowerAndUpperSecondary']['OUTPUT'],
-                'OUTPUT': parameters['Results']
+                'LAYER_NAME': '',
+                'LAYER_OPTIONS': '',
+                'OUTPUT': ExportResultsToExcel
             }
-            outputs['DropFields'] = processing.run('qgis:deletecolumn', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            results['Results'] = outputs['DropFields']['OUTPUT']
+            outputs['ExportingTheResultsToExcel'] = processing.run('native:savefeatures', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
             feedback.setCurrentStep(37)
+            if feedback.isCanceled():
+                return {}
+
+
+            # Preparing the table to export the parameters - Lower and Upper secondary
+            alg_params = {
+                'FIELDS_MAPPING': [{'expression': parameters['ISOcountrycode'].lower(),'length': 10,'name': 'ISO country code','precision': 0,'type': 10},
+                                   {'expression': Year,'length': 0,'name': 'Year','precision': 0,'type': 2},
+                                   {'expression': Preprimarystartingage,'length': 0,'name': 'Pre-primary starting age','precision': 0,'type': 2},
+                                   {'expression': Preprimaryduration,'length': 0,'name': 'Pre-primary duration','precision': 0,'type': 2},
+                                   {'expression': Primarystartingage,'length': 0,'name': 'Primary starting age','precision': 0,'type': 2},
+                                   {'expression': Primaryduration,'length': 0,'name': 'Primary duration','precision': 0,'type': 2},
+                                   {'expression': Secondarystartingage,'length': 0,'name': 'Secondary starting age','precision': 0,'type': 2},
+                                   {'expression': Secondaryduration,'length': 0,'name': 'Secondary duration','precision': 0,'type': 2}],
+                'INPUT': outputs['RandomPointsInExtent']['OUTPUT'],
+                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+            }
+            outputs['PreparingTheTableToExportTheParametersLowerAndUpperSecondary'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+            feedback.setCurrentStep(38)
+            if feedback.isCanceled():
+                return {}
+
+
+            # Export to spreadsheet
+            ExportParametersToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "Parameters.xlsx"
+            alg_params = {
+                'FORMATTED_VALUES': False,
+                'LAYERS': outputs['PreparingTheTableToExportTheParametersLowerAndUpperSecondary']['OUTPUT'],
+                'OUTPUT': ExportParametersToExcel,
+                'OVERWRITE': False,
+                'USE_ALIAS': False
+            }
+            outputs['ExportToSpreadsheet'] = processing.run('native:exporttospreadsheet', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+            feedback.setCurrentStep(39)
             if feedback.isCanceled():
                 return {}
 
@@ -1315,35 +1487,24 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                 'METHOD': 1,
                 'PREDICATE': [2],
                 'PREFIX': '',
-                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+                'OUTPUT': parameters['Results']
             }
             outputs['CreatingTheFileShapefile'] = processing.run('native:joinattributesbylocation', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            results['Results'] = outputs['CreatingTheFileShapefile']['OUTPUT']
 
             feedback.setCurrentStep(34)
             if feedback.isCanceled():
                 return {}
 
-            # Drop field(s)
-            alg_params = {
-                'COLUMN': ['fid'],
-                'INPUT': outputs['CreatingTheFileShapefile']['OUTPUT'],
-                'OUTPUT': parameters['Results']
-            }
-            outputs['DropFields'] = processing.run('qgis:deletecolumn', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            results['Results'] = outputs['DropFields']['OUTPUT']
-
-            feedback.setCurrentStep(35)
-            if feedback.isCanceled():
-                return {}
 
             # Exporting the results to Excel
+            ExportResultsToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "SchoolAge.xlsx"
             alg_params = {
                 'DATASOURCE_OPTIONS': '',
                 'INPUT': outputs['CreatingTheFileShapefile']['OUTPUT'],
                 'LAYER_NAME': '',
                 'LAYER_OPTIONS': '',
-                'OUTPUT': QgsExpression('@Foldercontainingtherasterfiles || \'/\' || \'Population_estimates_\' ||  upper(@ISOcountrycode) || \'_\'  || to_string( @Year ) || \'.xlsx\'').evaluate(),
-                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+                'OUTPUT': ExportResultsToExcel
             }
             outputs['ExportingTheResultsToExcel'] = processing.run('native:savefeatures', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
@@ -1352,7 +1513,37 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                 return {}
 
 
-        
+            # Preparing the table to export the parameters
+            alg_params = {
+                'FIELDS_MAPPING': [{'expression': parameters['ISOcountrycode'].lower(),'length': 10,'name': 'ISO country code','precision': 0,'type': 10},
+                                   {'expression': Year,'length': 0,'name': 'Year','precision': 0,'type': 2}],
+                'INPUT': outputs['RandomPointsInExtent']['OUTPUT'],
+                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+            }
+            outputs['PreparingTheTableToExportTheParameters'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+
+            feedback.setCurrentStep(37)
+            if feedback.isCanceled():
+                return {}
+
+
+            # Export to spreadsheet
+            ExportParametersToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "Parameters.xlsx"
+            alg_params = {
+                'FORMATTED_VALUES': False,
+                'LAYERS': outputs['PreparingTheTableToExportTheParameters']['OUTPUT'],
+                'OUTPUT': ExportParametersToExcel,
+                'OVERWRITE': False,
+                'USE_ALIAS': False
+            }
+            outputs['ExportToSpreadsheet'] = processing.run('native:exporttospreadsheet', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            
+
+            feedback.setCurrentStep(38)
+            if feedback.isCanceled():
+                return {}
+
+
         return results
 
         
@@ -1366,7 +1557,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         """
-        return 'School-age population'
+        return 'Sprague Multipliers'
 
     def displayName(self):
         """
@@ -1397,7 +1588,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
     def shortHelpString(self):
         return """<html><body><h2>Algorithm description</h2>
-<p>This algorithm aims at creating single years of age for any level of administrative boundaries or any other polygon layer, based on clustered 5-year age group raster files, by applying Sprague multipliers. It also allows the user to reconstruct the different school age groups for a particular country, regardless of whether the system divides lower and upper secondary or not. </p>
+<p>Test This algorithm aims at creating single years of age for any level of administrative boundaries or any other polygon layer, based on clustered 5-year age group raster files, by applying Sprague multipliers. It also allows the user to reconstruct the different school age groups for a particular country, regardless of whether the system divides lower and upper secondary or not. </p>
 <h2>Input parameters</h2>
 <h3>Folder containing the raster files</h3>
 <p>Select the folder containing the raster files with the 5-year age groups.</p>
@@ -1450,7 +1641,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 <p>This will only be created if the option to create custom school age groups and to make a distinction between Lower and Upper secondary is selected. It will create, in addition to the single year of age columns, additional columns by sex for each educational level. </p>
 <h3>Results with Secondary</h3>
 <p>This will only be created if the option to create custom school age groups is selected and the option to make a distinction between Lower and Upper secondary is unselected. It will create, in addition to the single year of age columns, additional columns by sex for each educational level. </p>
-<br><p align="right">Algorithm author: Development unit, IIEP-UNESCO (development@iiep.unesco.org). The designations employed and the presentation of the material in this publication do not imply the expression of any opinion whatsoever on the part of UNESCO or IIEP concerning the legal status of any country, territory, city or area, or of its authorities, or concerning the delimitation of its frontiers or boundaries.  This material has been partly funded by UK aid from the UK government; however the views expressed do not necessarily reflect the UK government’s official policies.</p><p align="right">Help author: Development unit, IIEP-UNESCO (development@iiep.unesco.org)</p><p align="right">Algorithm version: 1.0</p></body></html>"""
+<br><p align="right">Algorithm author: Development unit, IIEP-UNESCO (development@iiep.unesco.org)</p><p align="right">Help author: Development unit, IIEP-UNESCO (development@iiep.unesco.org)</p><p align="right">Algorithm version: 1.0</p></body></html>"""
 
 
 

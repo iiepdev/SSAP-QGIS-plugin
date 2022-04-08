@@ -65,7 +65,7 @@ class SpragueMultipliersPlugin(object):
       icon = os.path.join(os.path.join(cmd_folder, 'logo.png'))
       self.action = QAction(
           QIcon(icon),
-          u"School-age population", self.iface.mainWindow())
+          u"Sprague multipliers", self.iface.mainWindow())
       self.action.triggered.connect(self.run)
       self.iface.addPluginToMenu(u"&SpragueMultipliersAlgorithm", self.action)
       self.iface.addToolBarIcon(self.action)
@@ -76,4 +76,4 @@ class SpragueMultipliersPlugin(object):
       self.iface.removeToolBarIcon(self.action)
 
     def run(self):
-      processing.execAlgorithmDialog("IIEP-UNESCO:School-age populations")
+      processing.execAlgorithmDialog("IIEP-UNESCO:Sprague Multipliers")
