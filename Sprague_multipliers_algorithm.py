@@ -327,386 +327,37 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         Secondarystartingage = self.parameterAsInt(parameters, 'Secondarystartingage', context)
         Secondaryduration = self.parameterAsInt(parameters, 'Secondaryduration', context)
         Foldercontainingtherasterfiles = self.parameterAsString(parameters, 'Foldercontainingtherasterfiles', context)
-        
 
-        # Female 0 to 1
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterFemale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterFemale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterFemale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'F_0_',
-            'INPUT_RASTER':RasterFemale0to1,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Female0To1'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        feedback.setCurrentStep(1)
-        if feedback.isCanceled():
-            return {}
 
-        
-        # Female 1 to 4
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterFemale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_1_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterFemale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_1_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterFemale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_1_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'F_1_',
-            'INPUT_RASTER': RasterFemale1to4,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Female1To4'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        Genders = ['f', 'm']
+        Ages = [['0', '1'], ['1', '4'], ['5', '9'], ['10', '14'], ['15', '19'], ['20', '24'], ['25', '29'], ['30', '34'], ['35', '39']]
+        count = 1
+        for Gender in Genders:
+            for Age in Ages:
+                
+                fn = '_{}_{}_'.format(Gender, Age[0]) + str(parameters['Year'])
+                out = '{}{}To{}'.format(Gender.upper(), Age[0], Age[1])
+                if not parameters['Useconstrainedpopulationestimates']:
+                    fn = parameters['ISOcountrycode'].lower() + fn + ".tif"
+                elif parameters['Useconstrainedpopulationestimates'] and not parameters['UseUNadjustedconstrainedestimates']:
+                    fn = parameters['ISOcountrycode'].lower() + fn + "_constrained.tif"
+                elif parameters['Useconstrainedpopulationestimates'] and parameters['UseUNadjustedconstrainedestimates']:
+                    fn = parameters['ISOcountrycode'].lower() + fn + "_constrained_UNadj.tif"
+                alg_params = {
+                    'COLUMN_PREFIX': '{}_{}_'.format(Gender.upper(), Age[0]),
+                    'INPUT_RASTER': os.path.join(Foldercontainingtherasterfiles, fn),
+                    'INPUT_VECTOR': parameters['Administrativeboundaries'],
+                    'RASTER_BAND': 1,
+                    'STATISTICS': [1]
+                }
+                outputs[out] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
 
-        feedback.setCurrentStep(2)
-        if feedback.isCanceled():
-            return {}
+                feedback.setCurrentStep(count)
+                count += 1
+                if feedback.isCanceled():
+                    return {}
 
-        # Distinguish between Lower and Upper secondary
-        alg_params = {
-        }
-        outputs['DistinguishBetweenLowerAndUpperSecondary'] = processing.run('native:condition', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(3)
-        if feedback.isCanceled():
-            return {}
-
-        # Create custom age groups
-        alg_params = {
-        }
-        outputs['CreateCustomAgeGroups'] = processing.run('native:condition', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(4)
-        if feedback.isCanceled():
-            return {}
-
-        # Female 5 to 9
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterFemale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_5_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterFemale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_5_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterFemale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_5_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'F_5_',
-            'INPUT_RASTER': RasterFemale5to9,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Female5To9'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(5)
-        if feedback.isCanceled():
-            return {}
-
-        # Female 10 to 14
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterFemale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_10_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterFemale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_10_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterFemale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_10_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'F_10_',
-            'INPUT_RASTER': RasterFemale10to14,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Female10To14'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(6)
-        if feedback.isCanceled():
-            return {}
-
-        # Female 15 to 19
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterFemale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_15_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterFemale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_15_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterFemale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_15_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'F_15_',
-            'INPUT_RASTER': RasterFemale15to19,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Female15To19'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(7)
-        if feedback.isCanceled():
-            return {}
-
-        # Female 20 to 24
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterFemale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_20_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterFemale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_20_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterFemale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_20_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'F_20_',
-            'INPUT_RASTER': RasterFemale20to24,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Female20To24'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(8)
-        if feedback.isCanceled():
-            return {}
-
-        # Female 25 to 29
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterFemale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_25_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterFemale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_25_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterFemale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_25_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'F_25_',
-            'INPUT_RASTER': RasterFemale25to29,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Female25To29'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(9)
-        if feedback.isCanceled():
-            return {}
-
-        # Female 30 to 34
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterFemale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_30_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterFemale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_30_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterFemale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_30_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'F_30_',
-            'INPUT_RASTER': RasterFemale30to34,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Female30To34'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(10)
-        if feedback.isCanceled():
-            return {}
-
-        # Female 35 to 39
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterFemale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_35_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterFemale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_35_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterFemale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_f_35_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'F_35_',
-            'INPUT_RASTER': RasterFemale35to39,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Female35To39'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(11)
-        if feedback.isCanceled():
-            return {}
-
-        # Male 0 to 1
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterMale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_0_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterMale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_0_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterMale0to1 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_0_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'M_0_',
-            'INPUT_RASTER': RasterMale0to1,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Male0To1'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(12)
-        if feedback.isCanceled():
-            return {}
-
-        # Male 1 to 4
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterMale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_1_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterMale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_1_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterMale1to4 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_1_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'M_1_',
-            'INPUT_RASTER': RasterMale1to4,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Male1To4'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(13)
-        if feedback.isCanceled():
-            return {}
-
-        # Male 5 to 9
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterMale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_5_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterMale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_5_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterMale5to9 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_5_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'M_5_',
-            'INPUT_RASTER': RasterMale5to9,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Male5To9'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(14)
-        if feedback.isCanceled():
-            return {}
-
-        # Male 10 to 14
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterMale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_10_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterMale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_10_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterMale10to14 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_10_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'M_10_',
-            'INPUT_RASTER': RasterMale10to14,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Male10To14'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(15)
-        if feedback.isCanceled():
-            return {}
-
-        # Male 15 to 19
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterMale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_15_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterMale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_15_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterMale15to19 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_15_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'M_15_',
-            'INPUT_RASTER': RasterMale15to19,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Male15To19'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(16)
-        if feedback.isCanceled():
-            return {}
-
-        # Male 20 to 24
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterMale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_20_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterMale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_20_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterMale20to24 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_20_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'M_20_',
-            'INPUT_RASTER': RasterMale20to24,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Male20To24'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(17)
-        if feedback.isCanceled():
-            return {}
-
-        # Male 25 to 29
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterMale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_25_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterMale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_25_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterMale25to29 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_25_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'M_25_',
-            'INPUT_RASTER': RasterMale25to29,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Male25To29'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(18)
-        if feedback.isCanceled():
-            return {}
-
-        # Male 30 to 34
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterMale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_30_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterMale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_30_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterMale30to34 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_30_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'M_30_',
-            'INPUT_RASTER': RasterMale30to34,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Male30To34'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(19)
-        if feedback.isCanceled():
-            return {}
-
-        # Male 35 to 39
-        if parameters['Useconstrainedpopulationestimates'] == False:
-            RasterMale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_35_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == False:
-            RasterMale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_35_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters['Useconstrainedpopulationestimates'] == True and parameters['UseUNadjustedconstrainedestimates'] == True:
-            RasterMale35to39 = parameters['Foldercontainingtherasterfiles'] + '\\' + parameters['ISOcountrycode'].lower() + "_m_35_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        alg_params = {
-            'COLUMN_PREFIX': 'M_35_',
-            'INPUT_RASTER': RasterMale35to39,
-            'INPUT_VECTOR': parameters['Administrativeboundaries'],
-            'RASTER_BAND': 1,
-            'STATISTICS': [1]
-        }
-        outputs['Male35To39'] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-        feedback.setCurrentStep(20)
-        if feedback.isCanceled():
-            return {}
 
         # Creating the 0 to 4 age groups
         alg_params = {
@@ -1083,7 +734,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
       
-        if parameters['Createcustomschoolagegroups']==True and parameters['SystemdividedinLowerandUppersecondary']==False:
+        if parameters['Createcustomschoolagegroups'] and not parameters['SystemdividedinLowerandUppersecondary']:
 
             # Calculating school ages with Secondary
             alg_params = {
@@ -1279,7 +930,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
 
 
-        if parameters['Createcustomschoolagegroups']==True and parameters['SystemdividedinLowerandUppersecondary']==True:
+        if parameters['Createcustomschoolagegroups'] and parameters['SystemdividedinLowerandUppersecondary']:
 
             # Calculating school ages with Lower and Upper secondary
             alg_params = {
@@ -1475,7 +1126,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
             
 
-        if parameters['Createcustomschoolagegroups']==False:
+        if not parameters['Createcustomschoolagegroups']:
 
 
             # Creating the file shapefile
