@@ -173,7 +173,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             maxValue=4,
             defaultValue=None
         )
-        
+
         param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
 
@@ -212,7 +212,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         )
         param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
-        
+
         # Lower secondary starting age
         param = QgsProcessingParameterNumber(
             'Lowersecondarystartingage',
@@ -239,7 +239,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
 
-        # Upper secondary starting age        
+        # Upper secondary starting age
         param = QgsProcessingParameterNumber(
             'Uppersecondarystartingage',
             'Upper secondary starting age',
@@ -252,7 +252,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
 
-        # Upper secondary starting age        
+        # Upper secondary starting age
         param = QgsProcessingParameterNumber(
             'Uppersecondaryduration',
             'Upper secondary duration',
@@ -264,7 +264,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         )
         param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
-        
+
         # Secondary starting age
         param = QgsProcessingParameterNumber(
             'Secondarystartingage',
@@ -335,7 +335,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         count = 1
         for Gender in Genders:
             for Age in Ages:
-                
+
                 fn = '_{}_{}_'.format(Gender, Age[0]) + str(parameters['Year'])
                 out = '{}{}To{}'.format(Gender.upper(), Age[0], Age[1])
                 if not parameters['Useconstrainedpopulationestimates']:
@@ -391,7 +391,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'INPUT': outputs['CreatingThe0To4AgeGroups']['OUTPUT']
         }
         outputs['CreateSpatialIndexSection0'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-        
+
 
         feedback.setCurrentStep(22)
         if feedback.isCanceled():
@@ -733,7 +733,13 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         feedback.setCurrentStep(5)
         if feedback.isCanceled():
             return {}
-      
+
+        country_code = parameters['ISOcountrycode']
+        year = parameters['Year']
+        fn = f'Population_estimates_{country_code}{year}Parameters.xlsx'
+        exportParametersToExcel = os.path.join(parameters['Foldercontainingtherasterfiles'], fn)
+        feedback.pushDebugInfo(f'output excel file: {exportParametersToExcel}')
+
         if parameters['Createcustomschoolagegroups'] and not parameters['SystemdividedinLowerandUppersecondary']:
 
             # Calculating school ages with Secondary
@@ -841,7 +847,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
             outputs['CalculatingSchoolAgesWithSecondary'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            
+
             feedback.setCurrentStep(34)
             if feedback.isCanceled():
                 return {}
@@ -912,13 +918,11 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             if feedback.isCanceled():
                 return {}
 
-
             # Export to spreadsheet
-            ExportParametersToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "Parameters.xlsx"
             alg_params = {
                 'FORMATTED_VALUES': False,
                 'LAYERS': outputs['PreparingTheTableToExportTheParametersSecondary']['OUTPUT'],
-                'OUTPUT': ExportParametersToExcel,
+                'OUTPUT': exportParametersToExcel,
                 'OVERWRITE': False,
                 'USE_ALIAS': False
             }
@@ -927,8 +931,6 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             feedback.setCurrentStep(40)
             if feedback.isCanceled():
                 return {}
-
-
 
         if parameters['Createcustomschoolagegroups'] and parameters['SystemdividedinLowerandUppersecondary']:
 
@@ -1110,11 +1112,10 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
 
             # Export to spreadsheet
-            ExportParametersToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "Parameters.xlsx"
             alg_params = {
                 'FORMATTED_VALUES': False,
                 'LAYERS': outputs['PreparingTheTableToExportTheParametersLowerAndUpperSecondary']['OUTPUT'],
-                'OUTPUT': ExportParametersToExcel,
+                'OUTPUT': exportParametersToExcel,
                 'OVERWRITE': False,
                 'USE_ALIAS': False
             }
@@ -1124,7 +1125,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             if feedback.isCanceled():
                 return {}
 
-            
+
 
         if not parameters['Createcustomschoolagegroups']:
 
@@ -1179,16 +1180,15 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
 
             # Export to spreadsheet
-            ExportParametersToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "Parameters.xlsx"
             alg_params = {
                 'FORMATTED_VALUES': False,
                 'LAYERS': outputs['PreparingTheTableToExportTheParameters']['OUTPUT'],
-                'OUTPUT': ExportParametersToExcel,
+                'OUTPUT': exportParametersToExcel,
                 'OVERWRITE': False,
                 'USE_ALIAS': False
             }
             outputs['ExportToSpreadsheet'] = processing.run('native:exporttospreadsheet', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            
+
 
             feedback.setCurrentStep(38)
             if feedback.isCanceled():
@@ -1197,7 +1197,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         return results
 
-        
+
 
 
     def name(self):
@@ -1304,5 +1304,3 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
     def createInstance(self):
         return SpragueMultipliersAlgorithm()
-
-
