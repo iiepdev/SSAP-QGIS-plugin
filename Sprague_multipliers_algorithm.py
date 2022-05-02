@@ -208,7 +208,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'SystemdividedinLowerandUppersecondary',
             'System divided in Lower and Upper secondary',
             optional=True,
-            defaultValue=True
+            defaultValue=False
         )
         param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
@@ -310,53 +310,148 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         results = {}
         outputs = {}
 
-        ISOCountryCode = self.parameterAsString(parameters, 'ISOcountrycode', context)
-        Year = self.parameterAsInt(parameters, 'Year', context)
-        UseConstrainedPopulationEstimates = self.parameterAsBool(parameters, 'Useconstrainedpopulationestimates', context)
-        UseUNAdjustedConstrainedPopulationEstimates = self.parameterAsBool(parameters, 'UseUNadjustedconstrainedestimates', context)
-        CreateCustomAgeGroups = self.parameterAsBool(parameters, 'Createcustomschoolagegroups', context)
-        DivideLowerUpperSecondary = self.parameterAsBool(parameters, 'SystemdividedinLowerandUppersecondary', context)
-        Preprimarystartingage = self.parameterAsInt(parameters, 'Preprimarystartingage', context)
-        Preprimaryduration = self.parameterAsInt(parameters, 'Preprimaryduration', context)
-        Primarystartingage = self.parameterAsInt(parameters, 'Primarystartingage', context)
-        Primaryduration = self.parameterAsInt(parameters, 'Primaryduration', context)
-        Lowersecondarystartingage = self.parameterAsInt(parameters, 'Lowersecondarystartingage', context)
-        Lowersecondaryduration = self.parameterAsInt(parameters, 'Lowersecondaryduration', context)
-        Uppersecondarystartingage = self.parameterAsInt(parameters, 'Uppersecondarystartingage', context)
-        Uppersecondaryduration = self.parameterAsInt(parameters, 'Uppersecondaryduration', context)
-        Secondarystartingage = self.parameterAsInt(parameters, 'Secondarystartingage', context)
-        Secondaryduration = self.parameterAsInt(parameters, 'Secondaryduration', context)
-        Foldercontainingtherasterfiles = self.parameterAsString(parameters, 'Foldercontainingtherasterfiles', context)
+        ISOCountryCode = self.parameterAsString(parameters,
+                                                'ISOcountrycode',
+                                                context)
+        Year = self.parameterAsInt(parameters,
+                                   'Year',
+                                   context)
+        UseConstrainedPopulationEstimates = self.parameterAsBool(parameters,
+                                                                 'Useconstrainedpopulationestimates',
+                                                                 context)
+        UseUNAdjustedConstrainedPopulationEstimates = self.parameterAsBool(parameters,
+                                                                           'UseUNadjustedconstrainedestimates',
+                                                                           context)
+        CreateCustomAgeGroups = self.parameterAsBool(parameters,
+                                                     'Createcustomschoolagegroups',
+                                                     context)
+        DivideLowerUpperSecondary = self.parameterAsBool(parameters,
+                                                         'SystemdividedinLowerandUppersecondary',
+                                                         context)
+        Preprimarystartingage = self.parameterAsInt(parameters,
+                                                    'Preprimarystartingage',
+                                                    context)
+        Preprimaryduration = self.parameterAsInt(parameters,
+                                                 'Preprimaryduration',
+                                                 context)
+        Primarystartingage = self.parameterAsInt(parameters,
+                                                 'Primarystartingage',
+                                                 context)
+        Primaryduration = self.parameterAsInt(parameters,
+                                              'Primaryduration',
+                                              context)
+        Lowersecondarystartingage = self.parameterAsInt(parameters,
+                                                        'Lowersecondarystartingage',
+                                                        context)
+        Lowersecondaryduration = self.parameterAsInt(parameters,
+                                                     'Lowersecondaryduration',
+                                                     context)
+        Uppersecondarystartingage = self.parameterAsInt(parameters,
+                                                        'Uppersecondarystartingage',
+                                                        context)
+        Uppersecondaryduration = self.parameterAsInt(parameters,
+                                                     'Uppersecondaryduration',
+                                                     context)
+        Secondarystartingage = self.parameterAsInt(parameters,
+                                                   'Secondarystartingage',
+                                                   context)
+        Secondaryduration = self.parameterAsInt(parameters,
+                                                'Secondaryduration',
+                                                context)
+        Foldercontainingtherasterfiles = self.parameterAsString(parameters,
+                                                                'Foldercontainingtherasterfiles',
+                                                                context)
+
+        # Providing warnings in case some of the optional values was not specified
+        if parameters['Createcustomschoolagegroups'] and \
+           (parameters['Preprimarystartingage'] is None or \
+            parameters['Preprimaryduration'] is None or \
+            parameters['Primarystartingage'] is None or \
+            parameters['Primaryduration'] is None):
+            feedback.pushWarning(f'You have selected the option "Create custom school age groups". \
+            However, it looks like you failed to provide starting age or duration for at least one of the levels. \
+            The code might fail to create the desired columns')
+        if parameters['Createcustomschoolagegroups'] and \
+           parameters['SystemdividedinLowerandUppersecondary'] and \
+           (parameters['Lowersecondarystartingage'] is None or \
+            parameters['Lowersecondaryduration'] is None or \
+            parameters['Uppersecondarystartingage'] is None or \
+            parameters['Uppersecondaryduration'] is None):
+            feedback.pushWarning(f'You have selected the option "System divided in Lower and Upper secondary". \
+            However, it looks like you failed to provide starting age or duration for at least one of the Secondary levels. \
+            The code might fail to create the desired columns')
+        if parameters['Createcustomschoolagegroups'] and \
+        not parameters['SystemdividedinLowerandUppersecondary'] and \
+           (parameters['Secondarystartingage'] is None or \
+            parameters['Secondaryduration'] is None):
+            feedback.pushWarning(f'You have not selected the option "System divided in Lower and Upper secondary". \
+            However, it looks like you failed to provide starting age or duration for the Secondary level. \
+            The code might fail to create the desired columns')
 
 
+
+        if not parameters['Useconstrainedpopulationestimates']:
+            fn = parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + ".tif"
+        elif parameters['Useconstrainedpopulationestimates'] and not parameters['UseUNadjustedconstrainedestimates']:
+            fn = parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained.tif"
+        elif parameters[    'Useconstrainedpopulationestimates'] and parameters['UseUNadjustedconstrainedestimates']:
+            fn = parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained_UNadj.tif"
+        feedback.pushDebugInfo(f'Point0')
+        alg_params = {
+            'COLUMN_PREFIX': 'F_0_',
+            'INPUT': parameters['Administrativeboundaries'],
+            'INPUT_RASTER': os.path.join(Foldercontainingtherasterfiles, fn),
+            'RASTER_BAND': 1,
+            'STATISTICS': [1],  # Sum
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['1'] = processing.run('native:zonalstatisticsfb',
+                                               alg_params,
+                                               context=context,
+                                               feedback=feedback,
+                                               is_child_algorithm=True
+                                               )
+
+
+        feedback.setCurrentStep(1)        
 
         Genders = ['f', 'm']
         Ages = [['0', '1'], ['1', '4'], ['5', '9'], ['10', '14'], ['15', '19'], ['20', '24'], ['25', '29'], ['30', '34'], ['35', '39']]
-        count = 1
+
+        count = 2
         for Gender in Genders:
             for Age in Ages:
+                if Gender=='f' and Age[0]=='0':
+                    continue
+                else:
+                    inputvector = str(count-1)
+                    fn = '_{}_{}_'.format(Gender, Age[0]) + str(parameters['Year'])
+                    out = '{}{}To{}'.format(Gender.upper(), Age[0], Age[1])
+                    if not parameters['Useconstrainedpopulationestimates']:
+                        fn = parameters['ISOcountrycode'].lower() + fn + ".tif"
+                    elif parameters['Useconstrainedpopulationestimates'] and not parameters['UseUNadjustedconstrainedestimates']:
+                        fn = parameters['ISOcountrycode'].lower() + fn + "_constrained.tif"
+                    elif parameters['Useconstrainedpopulationestimates'] and parameters['UseUNadjustedconstrainedestimates']:
+                        fn = parameters['ISOcountrycode'].lower() + fn + "_constrained_UNadj.tif"
+                    alg_params = {
+                        'COLUMN_PREFIX': '{}_{}_'.format(Gender.upper(), Age[0]),
+                        'INPUT': outputs[inputvector]['OUTPUT'],
+                        'INPUT_RASTER': os.path.join(Foldercontainingtherasterfiles, fn),
+                        'RASTER_BAND': 1,
+                        'STATISTICS': [1],  # Sum
+                        'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+                    }
+                    outputs[str(count)] = processing.run('native:zonalstatisticsfb',
+                                                           alg_params,
+                                                           context=context,
+                                                           feedback=feedback,
+                                                           is_child_algorithm=True
+                                                           )
 
-                fn = '_{}_{}_'.format(Gender, Age[0]) + str(parameters['Year'])
-                out = '{}{}To{}'.format(Gender.upper(), Age[0], Age[1])
-                if not parameters['Useconstrainedpopulationestimates']:
-                    fn = parameters['ISOcountrycode'].lower() + fn + ".tif"
-                elif parameters['Useconstrainedpopulationestimates'] and not parameters['UseUNadjustedconstrainedestimates']:
-                    fn = parameters['ISOcountrycode'].lower() + fn + "_constrained.tif"
-                elif parameters['Useconstrainedpopulationestimates'] and parameters['UseUNadjustedconstrainedestimates']:
-                    fn = parameters['ISOcountrycode'].lower() + fn + "_constrained_UNadj.tif"
-                alg_params = {
-                    'COLUMN_PREFIX': '{}_{}_'.format(Gender.upper(), Age[0]),
-                    'INPUT_RASTER': os.path.join(Foldercontainingtherasterfiles, fn),
-                    'INPUT_VECTOR': parameters['Administrativeboundaries'],
-                    'RASTER_BAND': 1,
-                    'STATISTICS': [1]
-                }
-                outputs[out] = processing.run('native:zonalstatistics', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-                feedback.setCurrentStep(count)
-                count += 1
-                if feedback.isCanceled():
-                    return {}
+                    feedback.setCurrentStep(count)
+                    count += 1
+                    if feedback.isCanceled():
+                        return {}
 
 
         # Creating the 0 to 4 age groups
@@ -377,10 +472,17 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                                {'expression': 'M_35_sum','length': 0,'name': 'M_35_sum','precision': 0,'type': 6},
                                {'expression': '\"F_0_sum\" + \"F_1_sum\"','length': 0,'name': 'F_0_sum','precision': 0,'type': 6},
                                {'expression': '\"M_0_sum\" + \"M_1_sum\"','length': 0,'name': 'M_0_sum','precision': 0,'type': 6}],
-            'INPUT': parameters['Administrativeboundaries'],
+            'INPUT': outputs['18']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['CreatingThe0To4AgeGroups'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['CreatingThe0To4AgeGroups'] = processing.run('native:refactorfields',
+                                                             alg_params,
+                                                             context=context,
+                                                             feedback=feedback,
+                                                             is_child_algorithm=True
+                                                             )
+
+        results['Results'] = outputs['CreatingThe0To4AgeGroups']['OUTPUT']
 
         feedback.setCurrentStep(21)
         if feedback.isCanceled():
@@ -390,7 +492,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         alg_params = {
             'INPUT': outputs['CreatingThe0To4AgeGroups']['OUTPUT']
         }
-        outputs['CreateSpatialIndexSection0'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['CreateSpatialIndexSection0'] = processing.run('native:createspatialindex',
+                                                               alg_params,
+                                                               context=context,
+                                                               feedback=feedback,
+                                                               is_child_algorithm=True
+                                                               )
 
 
         feedback.setCurrentStep(22)
@@ -463,7 +570,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'INPUT': outputs['CreateSpatialIndexSection0']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['CalculatingSingleYearsOfAgeSection1'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['CalculatingSingleYearsOfAgeSection1'] = processing.run('native:refactorfields',
+                                                                        alg_params,
+                                                                        context=context,
+                                                                        feedback=feedback,
+                                                                        is_child_algorithm=True
+                                                                        )
 
         feedback.setCurrentStep(23)
         if feedback.isCanceled():
@@ -473,7 +585,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         alg_params = {
             'INPUT': outputs['CalculatingSingleYearsOfAgeSection1']['OUTPUT']
         }
-        outputs['CreateSpatialIndexSection1'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['CreateSpatialIndexSection1'] = processing.run('native:createspatialindex',
+                                                               alg_params,
+                                                               context=context,
+                                                               feedback=feedback,
+                                                               is_child_algorithm=True
+                                                               )
 
         feedback.setCurrentStep(24)
         if feedback.isCanceled():
@@ -520,7 +637,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'INPUT': outputs['CreateSpatialIndexSection1']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['CalculatingSingleYearsOfAgeSection2'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['CalculatingSingleYearsOfAgeSection2'] = processing.run('native:refactorfields',
+                                                                        alg_params,
+                                                                        context=context,
+                                                                        feedback=feedback,
+                                                                        is_child_algorithm=True
+                                                                        )
 
         feedback.setCurrentStep(25)
         if feedback.isCanceled():
@@ -537,7 +659,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'INPUT': outputs['CalculatingSingleYearsOfAgeSection2']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['CalculatingSingleYearsOfAgeSection3'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['CalculatingSingleYearsOfAgeSection3'] = processing.run('native:refactorfields',
+                                                                        alg_params,
+                                                                        context=context,
+                                                                        feedback=feedback,
+                                                                        is_child_algorithm=True
+                                                                        )
 
         feedback.setCurrentStep(26)
         if feedback.isCanceled():
@@ -547,7 +674,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         alg_params = {
             'INPUT': outputs['CalculatingSingleYearsOfAgeSection2']['OUTPUT']
         }
-        outputs['CreateSpatialIndexSection2'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['CreateSpatialIndexSection2'] = processing.run('native:createspatialindex',
+                                                               alg_params,
+                                                               context=context,
+                                                               feedback=feedback,
+                                                               is_child_algorithm=True
+                                                               )
 
         feedback.setCurrentStep(27)
         if feedback.isCanceled():
@@ -557,7 +689,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         alg_params = {
             'INPUT': outputs['CalculatingSingleYearsOfAgeSection3']['OUTPUT']
         }
-        outputs['CreateSpatialIndexSection3'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['CreateSpatialIndexSection3'] = processing.run('native:createspatialindex',
+                                                               alg_params,
+                                                               context=context,
+                                                               feedback=feedback,
+                                                               is_child_algorithm=True
+                                                               )
 
         feedback.setCurrentStep(28)
         if feedback.isCanceled():
@@ -574,7 +711,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'PREFIX': '',
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['JoinAttributesByLocationSection1And2'] = processing.run('native:joinattributesbylocation', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['JoinAttributesByLocationSection1And2'] = processing.run('native:joinattributesbylocation',
+                                                                         alg_params,
+                                                                         context=context,
+                                                                         feedback=feedback,
+                                                                         is_child_algorithm=True
+                                                                         )
 
         feedback.setCurrentStep(29)
         if feedback.isCanceled():
@@ -584,7 +726,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         alg_params = {
             'INPUT': outputs['JoinAttributesByLocationSection1And2']['OUTPUT']
         }
-        outputs['CreateSpatialIndexSection1and2'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['CreateSpatialIndexSection1and2'] = processing.run('native:createspatialindex',
+                                                                   alg_params,
+                                                                   context=context,
+                                                                   feedback=feedback,
+                                                                   is_child_algorithm=True
+                                                                   )
 
         feedback.setCurrentStep(30)
         if feedback.isCanceled():
@@ -601,7 +748,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'PREFIX': '',
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['JoinAttributesByLocationSections1Through3'] = processing.run('native:joinattributesbylocation', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['JoinAttributesByLocationSections1Through3'] = processing.run('native:joinattributesbylocation',
+                                                                              alg_params,
+                                                                              context=context,
+                                                                              feedback=feedback,
+                                                                              is_child_algorithm=True
+                                                                              )
 
         feedback.setCurrentStep(31)
         if feedback.isCanceled():
@@ -702,7 +854,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'INPUT': outputs['JoinAttributesByLocationSections1Through3']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['ReorganizingTheResults'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['ReorganizingTheResults'] = processing.run('native:refactorfields',
+                                                           alg_params,
+                                                           context=context,
+                                                           feedback=feedback,
+                                                           is_child_algorithm=True
+                                                           )
 
         feedback.setCurrentStep(32)
         if feedback.isCanceled():
@@ -712,7 +869,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         alg_params = {
             'INPUT': parameters['Administrativeboundaries']
         }
-        outputs['IndexedAdministrativeboundaries'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['IndexedAdministrativeboundaries'] = processing.run('native:createspatialindex',
+                                                                    alg_params,
+                                                                    context=context,
+                                                                    feedback=feedback,
+                                                                    is_child_algorithm=True
+                                                                    )
 
         feedback.setCurrentStep(33)
         if feedback.isCanceled():
@@ -728,7 +890,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'TARGET_CRS': 'ProjectCrs',
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['RandomPointsInExtent'] = processing.run('native:randompointsinextent', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        outputs['RandomPointsInExtent'] = processing.run('native:randompointsinextent',
+                                                         alg_params,
+                                                         context=context,
+                                                         feedback=feedback,
+                                                         is_child_algorithm=True
+                                                         )
 
         feedback.setCurrentStep(5)
         if feedback.isCanceled():
@@ -736,9 +903,10 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         country_code = parameters['ISOcountrycode']
         year = parameters['Year']
-        fn = f'Population_estimates_{country_code}{year}Parameters.xlsx'
-        exportParametersToExcel = os.path.join(parameters['Foldercontainingtherasterfiles'], fn)
-        feedback.pushDebugInfo(f'output excel file: {exportParametersToExcel}')
+        fnParameters = f'Population_estimates_{country_code}{year}Parameters.xlsx'
+        fnSchoolAge = f'Population_estimates_{country_code}{year}SchoolAge.xlsx'
+        exportParametersToExcel = os.path.join(parameters['Foldercontainingtherasterfiles'], fnParameters)
+        exportSchoolAge = os.path.join(parameters['Foldercontainingtherasterfiles'], fnSchoolAge)
 
         if parameters['Createcustomschoolagegroups'] and not parameters['SystemdividedinLowerandUppersecondary']:
 
@@ -846,53 +1014,14 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                 'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
-            outputs['CalculatingSchoolAgesWithSecondary'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            outputs['CalculatingSchoolAges'] = processing.run('native:refactorfields',
+                                                                           alg_params,
+                                                                           context=context,
+                                                                           feedback=feedback,
+                                                                           is_child_algorithm=True
+                                                                           )
 
             feedback.setCurrentStep(34)
-            if feedback.isCanceled():
-                return {}
-
-            # Create spatial index for Secondary
-            alg_params = {
-                'INPUT': outputs['CalculatingSchoolAgesWithSecondary']['OUTPUT']
-            }
-            outputs['CreateSpatialIndexForSecondary'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-            feedback.setCurrentStep(35)
-            if feedback.isCanceled():
-                return {}
-
-            # Creating the file shapefile (Secondary)
-            alg_params = {
-                'DISCARD_NONMATCHING': True,
-                'INPUT': outputs['IndexedAdministrativeboundaries']['OUTPUT'],
-                'JOIN': outputs['CreateSpatialIndexForSecondary']['OUTPUT'],
-                'JOIN_FIELDS': [''],
-                'METHOD': 1,
-                'PREDICATE': [2],
-                'PREFIX': '',
-                'OUTPUT': parameters['Results']
-            }
-            outputs['CreatingTheFileShapefileSecondary'] = processing.run('native:joinattributesbylocation', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            results['Results'] = outputs['CreatingTheFileShapefileSecondary']['OUTPUT']
-
-            feedback.setCurrentStep(36)
-            if feedback.isCanceled():
-                return {}
-
-            # Exporting the results to Excel
-            ExportResultsToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "SchoolAge.xlsx"
-            alg_params = {
-                'DATASOURCE_OPTIONS': '',
-                'INPUT': outputs['CreatingTheFileShapefileSecondary']['OUTPUT'],
-                'LAYER_NAME': '',
-                'LAYER_OPTIONS': '',
-                'OUTPUT': ExportResultsToExcel,
-                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-            }
-            outputs['ExportingTheResultsToExcel'] = processing.run('native:savefeatures', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-            feedback.setCurrentStep(37)
             if feedback.isCanceled():
                 return {}
 
@@ -912,23 +1041,14 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                 'INPUT': outputs['RandomPointsInExtent']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
-            outputs['PreparingTheTableToExportTheParametersSecondary'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            outputs['PreparingTheTableToExportTheParameters'] = processing.run('native:refactorfields',
+                                                                                        alg_params,
+                                                                                        context=context,
+                                                                                        feedback=feedback,
+                                                                                        is_child_algorithm=True
+                                                                                        )
 
             feedback.setCurrentStep(39)
-            if feedback.isCanceled():
-                return {}
-
-            # Export to spreadsheet
-            alg_params = {
-                'FORMATTED_VALUES': False,
-                'LAYERS': outputs['PreparingTheTableToExportTheParametersSecondary']['OUTPUT'],
-                'OUTPUT': exportParametersToExcel,
-                'OVERWRITE': False,
-                'USE_ALIAS': False
-            }
-            outputs['ExportToSpreadsheet'] = processing.run('native:exporttospreadsheet', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-            feedback.setCurrentStep(40)
             if feedback.isCanceled():
                 return {}
 
@@ -1041,55 +1161,16 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                 'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
-            outputs['CalculatingSchoolAgesWithLowerAndUpperSecondary'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            outputs['CalculatingSchoolAges'] = processing.run('native:refactorfields',
+                                                                                        alg_params,
+                                                                                        context=context,
+                                                                                        feedback=feedback,
+                                                                                        is_child_algorithm=True
+                                                                                        )
 
             feedback.setCurrentStep(34)
             if feedback.isCanceled():
                 return {}
-
-            # Create spatial index for Lower and Upper secondary
-            alg_params = {
-                'INPUT': outputs['CalculatingSchoolAgesWithLowerAndUpperSecondary']['OUTPUT']
-            }
-            outputs['CreateSpatialIndexForLowerAndUpperSecondary'] = processing.run('native:createspatialindex', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-            feedback.setCurrentStep(35)
-            if feedback.isCanceled():
-                return {}
-
-            # Creating the file shapefile (Lower and Upper secondary)
-            alg_params = {
-                'DISCARD_NONMATCHING': True,
-                'INPUT': outputs['IndexedAdministrativeboundaries']['OUTPUT'],
-                'JOIN': outputs['CreateSpatialIndexForLowerAndUpperSecondary']['OUTPUT'],
-                'JOIN_FIELDS': [''],
-                'METHOD': 1,
-                'PREDICATE': [2],
-                'PREFIX': '',
-                'OUTPUT': parameters['Results']
-            }
-            outputs['CreatingTheFileShapefileLowerAndUpperSecondary'] = processing.run('native:joinattributesbylocation', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            results['Results'] = outputs['CreatingTheFileShapefileLowerAndUpperSecondary']['OUTPUT']
-
-            feedback.setCurrentStep(36)
-            if feedback.isCanceled():
-                return {}
-
-            # Exporting the results to Excel
-            ExportResultsToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "SchoolAge.xlsx"
-            alg_params = {
-                'DATASOURCE_OPTIONS': '',
-                'INPUT': outputs['CreatingTheFileShapefileLowerAndUpperSecondary']['OUTPUT'],
-                'LAYER_NAME': '',
-                'LAYER_OPTIONS': '',
-                'OUTPUT': ExportResultsToExcel
-            }
-            outputs['ExportingTheResultsToExcel'] = processing.run('native:savefeatures', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-            feedback.setCurrentStep(37)
-            if feedback.isCanceled():
-                return {}
-
 
             # Preparing the table to export the parameters - Lower and Upper secondary
             alg_params = {
@@ -1104,63 +1185,123 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                 'INPUT': outputs['RandomPointsInExtent']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
-            outputs['PreparingTheTableToExportTheParametersLowerAndUpperSecondary'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            outputs['PreparingTheTableToExportTheParameters'] = processing.run('native:refactorfields',
+                                                                                                     alg_params,
+                                                                                                     context=context,
+                                                                                                     feedback=feedback,
+                                                                                                     is_child_algorithm=True
+                                                                                                     )
 
             feedback.setCurrentStep(38)
             if feedback.isCanceled():
                 return {}
 
-
-            # Export to spreadsheet
-            alg_params = {
-                'FORMATTED_VALUES': False,
-                'LAYERS': outputs['PreparingTheTableToExportTheParametersLowerAndUpperSecondary']['OUTPUT'],
-                'OUTPUT': exportParametersToExcel,
-                'OVERWRITE': False,
-                'USE_ALIAS': False
-            }
-            outputs['ExportToSpreadsheet'] = processing.run('native:exporttospreadsheet', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-            feedback.setCurrentStep(39)
-            if feedback.isCanceled():
-                return {}
-
-
-
         if not parameters['Createcustomschoolagegroups']:
 
 
-            # Creating the file shapefile
+            # Calculating school ages 
             alg_params = {
-                'DISCARD_NONMATCHING': True,
-                'INPUT': outputs['IndexedAdministrativeboundaries']['OUTPUT'],
-                'JOIN': outputs['ReorganizingTheResults']['OUTPUT'],
-                'JOIN_FIELDS': [''],
-                'METHOD': 1,
-                'PREDICATE': [2],
-                'PREFIX': '',
-                'OUTPUT': parameters['Results']
+                'FIELDS_MAPPING': [{'expression': '\"Y_M_0\"','length': 0,'name': 'Y_M_0','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_1\"','length': 0,'name': 'Y_M_1','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_2\"','length': 0,'name': 'Y_M_2','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_3\"','length': 0,'name': 'Y_M_3','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_4\"','length': 0,'name': 'Y_M_4','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_5\"','length': 0,'name': 'Y_M_5','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_6\"','length': 0,'name': 'Y_M_6','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_7\"','length': 0,'name': 'Y_M_7','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_8\"','length': 0,'name': 'Y_M_8','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_9\"','length': 0,'name': 'Y_M_9','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_10\"','length': 0,'name': 'Y_M_10','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_11\"','length': 0,'name': 'Y_M_11','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_12\"','length': 0,'name': 'Y_M_12','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_13\"','length': 0,'name': 'Y_M_13','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_14\"','length': 0,'name': 'Y_M_14','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_15\"','length': 0,'name': 'Y_M_15','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_16\"','length': 0,'name': 'Y_M_16','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_17\"','length': 0,'name': 'Y_M_17','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_18\"','length': 0,'name': 'Y_M_18','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_19\"','length': 0,'name': 'Y_M_19','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_20\"','length': 0,'name': 'Y_M_20','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_21\"','length': 0,'name': 'Y_M_21','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_22\"','length': 0,'name': 'Y_M_22','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_23\"','length': 0,'name': 'Y_M_23','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_24\"','length': 0,'name': 'Y_M_24','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_25\"','length': 0,'name': 'Y_M_25','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_26\"','length': 0,'name': 'Y_M_26','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_27\"','length': 0,'name': 'Y_M_27','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_28\"','length': 0,'name': 'Y_M_28','precision': 0,'type': 6},
+                                   {'expression': '\"Y_M_29\"','length': 0,'name': 'Y_M_29','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_0\"','length': 0,'name': 'Y_F_0','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_1\"','length': 0,'name': 'Y_F_1','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_2\"','length': 0,'name': 'Y_F_2','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_3\"','length': 0,'name': 'Y_F_3','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_4\"','length': 0,'name': 'Y_F_4','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_5\"','length': 0,'name': 'Y_F_5','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_6\"','length': 0,'name': 'Y_F_6','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_7\"','length': 0,'name': 'Y_F_7','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_8\"','length': 0,'name': 'Y_F_8','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_9\"','length': 0,'name': 'Y_F_9','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_10\"','length': 0,'name': 'Y_F_10','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_11\"','length': 0,'name': 'Y_F_11','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_12\"','length': 0,'name': 'Y_F_12','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_13\"','length': 0,'name': 'Y_F_13','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_14\"','length': 0,'name': 'Y_F_14','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_15\"','length': 0,'name': 'Y_F_15','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_16\"','length': 0,'name': 'Y_F_16','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_17\"','length': 0,'name': 'Y_F_17','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_18\"','length': 0,'name': 'Y_F_18','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_19\"','length': 0,'name': 'Y_F_19','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_20\"','length': 0,'name': 'Y_F_20','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_21\"','length': 0,'name': 'Y_F_21','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_22\"','length': 0,'name': 'Y_F_22','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_23\"','length': 0,'name': 'Y_F_23','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_24\"','length': 0,'name': 'Y_F_24','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_25\"','length': 0,'name': 'Y_F_25','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_26\"','length': 0,'name': 'Y_F_26','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_27\"','length': 0,'name': 'Y_F_27','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_28\"','length': 0,'name': 'Y_F_28','precision': 0,'type': 6},
+                                   {'expression': '\"Y_F_29\"','length': 0,'name': 'Y_F_29','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_0\"','length': 0,'name': 'Y_T_0','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_1\"','length': 0,'name': 'Y_T_1','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_2\"','length': 0,'name': 'Y_T_2','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_3\"','length': 0,'name': 'Y_T_3','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_4\"','length': 0,'name': 'Y_T_4','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_5\"','length': 0,'name': 'Y_T_5','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_6\"','length': 0,'name': 'Y_T_6','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_7\"','length': 0,'name': 'Y_T_7','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_8\"','length': 0,'name': 'Y_T_8','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_9\"','length': 0,'name': 'Y_T_9','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_10\"','length': 0,'name': 'Y_T_10','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_11\"','length': 0,'name': 'Y_T_11','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_12\"','length': 0,'name': 'Y_T_12','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_13\"','length': 0,'name': 'Y_T_13','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_14\"','length': 0,'name': 'Y_T_14','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_15\"','length': 0,'name': 'Y_T_15','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_16\"','length': 0,'name': 'Y_T_16','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_17\"','length': 0,'name': 'Y_T_17','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_18\"','length': 0,'name': 'Y_T_18','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_19\"','length': 0,'name': 'Y_T_19','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_20\"','length': 0,'name': 'Y_T_20','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_21\"','length': 0,'name': 'Y_T_21','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_22\"','length': 0,'name': 'Y_T_22','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_23\"','length': 0,'name': 'Y_T_23','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_24\"','length': 0,'name': 'Y_T_24','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_25\"','length': 0,'name': 'Y_T_25','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_26\"','length': 0,'name': 'Y_T_26','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_27\"','length': 0,'name': 'Y_T_27','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_28\"','length': 0,'name': 'Y_T_28','precision': 0,'type': 6},
+                                   {'expression': '\"Y_T_29\"','length': 0,'name': 'Y_T_29','precision': 0,'type': 6}],
+                'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
+                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
-            outputs['CreatingTheFileShapefile'] = processing.run('native:joinattributesbylocation', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-            results['Results'] = outputs['CreatingTheFileShapefile']['OUTPUT']
+            outputs['CalculatingSchoolAges'] = processing.run('native:refactorfields',
+                                                                                        alg_params,
+                                                                                        context=context,
+                                                                                        feedback=feedback,
+                                                                                        is_child_algorithm=True
+                                                                                        )
 
             feedback.setCurrentStep(34)
-            if feedback.isCanceled():
-                return {}
-
-
-            # Exporting the results to Excel
-            ExportResultsToExcel = parameters['Foldercontainingtherasterfiles'] + '\\Population_estimates_' + parameters['ISOcountrycode'].lower() + str(parameters['Year']) + "SchoolAge.xlsx"
-            alg_params = {
-                'DATASOURCE_OPTIONS': '',
-                'INPUT': outputs['CreatingTheFileShapefile']['OUTPUT'],
-                'LAYER_NAME': '',
-                'LAYER_OPTIONS': '',
-                'OUTPUT': ExportResultsToExcel
-            }
-            outputs['ExportingTheResultsToExcel'] = processing.run('native:savefeatures', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
-
-            feedback.setCurrentStep(36)
             if feedback.isCanceled():
                 return {}
 
@@ -1172,27 +1313,95 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                 'INPUT': outputs['RandomPointsInExtent']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
-            outputs['PreparingTheTableToExportTheParameters'] = processing.run('native:refactorfields', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+            outputs['PreparingTheTableToExportTheParameters'] = processing.run('native:refactorfields',
+                                                                               alg_params,
+                                                                               context=context,
+                                                                               feedback=feedback,
+                                                                               is_child_algorithm=True
+                                                                               )
 
             feedback.setCurrentStep(37)
             if feedback.isCanceled():
                 return {}
 
 
-            # Export to spreadsheet
-            alg_params = {
-                'FORMATTED_VALUES': False,
-                'LAYERS': outputs['PreparingTheTableToExportTheParameters']['OUTPUT'],
-                'OUTPUT': exportParametersToExcel,
-                'OVERWRITE': False,
-                'USE_ALIAS': False
-            }
-            outputs['ExportToSpreadsheet'] = processing.run('native:exporttospreadsheet', alg_params, context=context, feedback=feedback, is_child_algorithm=True)
+        # Create spatial index
+        alg_params = {
+            'INPUT': outputs['CalculatingSchoolAges']['OUTPUT']
+        }
+        outputs['CreateSpatialIndex'] = processing.run('native:createspatialindex',
+                                                                   alg_params,
+                                                                   context=context,
+                                                                   feedback=feedback,
+                                                                   is_child_algorithm=True
+                                                                   )
+
+        feedback.setCurrentStep(35)
+        if feedback.isCanceled():
+            return {}
+
+        # Creating the file shapefile
+        alg_params = {
+            'DISCARD_NONMATCHING': True,
+            'INPUT': outputs['IndexedAdministrativeboundaries']['OUTPUT'],
+            'JOIN': outputs['CreateSpatialIndex']['OUTPUT'],
+            'JOIN_FIELDS': [''],
+            'METHOD': 1,
+            'PREDICATE': [2],
+            'PREFIX': '',
+            'OUTPUT': parameters['Results']
+        }
+        outputs['CreatingTheFileShapefile'] = processing.run('native:joinattributesbylocation',
+                                                                      alg_params,
+                                                                      context=context,
+                                                                      feedback=feedback,
+                                                                      is_child_algorithm=True
+                                                                      )
+        results['Results'] = outputs['CreatingTheFileShapefile']['OUTPUT']
+
+        feedback.setCurrentStep(36)
+        if feedback.isCanceled():
+            return {}
+        # Exporting the results to Excel
+        alg_params = {
+            'DATASOURCE_OPTIONS': '',
+            'INPUT': outputs['CreatingTheFileShapefile']['OUTPUT'],
+            'LAYER_NAME': '',
+            'LAYER_OPTIONS': '',
+            'OUTPUT': exportSchoolAge,
+            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+        }
+        outputs['ExportingTheResultsToExcel'] = processing.run('native:savefeatures',
+                                                               alg_params,
+                                                               context=context,
+                                                               feedback=feedback,
+                                                               is_child_algorithm=True
+                                                               )
+
+        feedback.setCurrentStep(37)
+        if feedback.isCanceled():
+            return {}
 
 
-            feedback.setCurrentStep(38)
-            if feedback.isCanceled():
-                return {}
+
+        # Export to spreadsheet
+        alg_params = {
+            'FORMATTED_VALUES': False,
+            'LAYERS': outputs['PreparingTheTableToExportTheParameters']['OUTPUT'],
+            'OUTPUT': exportParametersToExcel,
+            'OVERWRITE': False,
+            'USE_ALIAS': False
+        }
+        outputs['ExportToSpreadsheet'] = processing.run('native:exporttospreadsheet',
+                                                        alg_params,
+                                                        context=context,
+                                                        feedback=feedback,
+                                                        is_child_algorithm=True
+                                                        )
+
+        feedback.setCurrentStep(40)
+        if feedback.isCanceled():
+            return {}
 
 
         return results
