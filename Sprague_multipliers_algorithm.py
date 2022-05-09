@@ -396,7 +396,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             fn = parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained.tif"
         elif parameters[    'Useconstrainedpopulationestimates'] and parameters['UseUNadjustedconstrainedestimates']:
             fn = parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        feedback.pushDebugInfo(f'Point0')
+        
         alg_params = {
             'COLUMN_PREFIX': 'F_0_',
             'INPUT': parameters['Administrativeboundaries'],
@@ -760,97 +760,27 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             return {}
 
         # Reorganizing the results
+
+        Genders = ["M", "F", "T"]
+        field_mapping = []
+        
+        for Gender in Genders:
+            for Age in range(0,30):
+
+                expression_level = '"Y_' + Gender + '_' + str(Age) + '"'
+                expression_precision = 'Y_' + Gender + '_' + str(Age)
+
+                expression = {}
+                expression['expression']= expression_level
+                expression['length']=0
+                expression['name']=expression_precision
+                expression['precision']=0
+                expression['type']=6
+
+                field_mapping.append(expression)
+        
         alg_params = {
-            'FIELDS_MAPPING': [{'expression': '\"Y_M_0\"','length': 0,'name': 'Y_M_0','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_1\"','length': 0,'name': 'Y_M_1','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_2\"','length': 0,'name': 'Y_M_2','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_3\"','length': 0,'name': 'Y_M_3','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_4\"','length': 0,'name': 'Y_M_4','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_5\"','length': 0,'name': 'Y_M_5','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_6\"','length': 0,'name': 'Y_M_6','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_7\"','length': 0,'name': 'Y_M_7','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_8\"','length': 0,'name': 'Y_M_8','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_9\"','length': 0,'name': 'Y_M_9','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_10\"','length': 0,'name': 'Y_M_10','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_11\"','length': 0,'name': 'Y_M_11','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_12\"','length': 0,'name': 'Y_M_12','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_13\"','length': 0,'name': 'Y_M_13','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_14\"','length': 0,'name': 'Y_M_14','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_15\"','length': 0,'name': 'Y_M_15','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_16\"','length': 0,'name': 'Y_M_16','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_17\"','length': 0,'name': 'Y_M_17','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_18\"','length': 0,'name': 'Y_M_18','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_19\"','length': 0,'name': 'Y_M_19','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_20\"','length': 0,'name': 'Y_M_20','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_21\"','length': 0,'name': 'Y_M_21','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_22\"','length': 0,'name': 'Y_M_22','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_23\"','length': 0,'name': 'Y_M_23','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_24\"','length': 0,'name': 'Y_M_24','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_25\"','length': 0,'name': 'Y_M_25','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_26\"','length': 0,'name': 'Y_M_26','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_27\"','length': 0,'name': 'Y_M_27','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_28\"','length': 0,'name': 'Y_M_28','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_29\"','length': 0,'name': 'Y_M_29','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_0\"','length': 0,'name': 'Y_F_0','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_1\"','length': 0,'name': 'Y_F_1','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_2\"','length': 0,'name': 'Y_F_2','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_3\"','length': 0,'name': 'Y_F_3','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_4\"','length': 0,'name': 'Y_F_4','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_5\"','length': 0,'name': 'Y_F_5','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_6\"','length': 0,'name': 'Y_F_6','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_7\"','length': 0,'name': 'Y_F_7','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_8\"','length': 0,'name': 'Y_F_8','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_9\"','length': 0,'name': 'Y_F_9','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_10\"','length': 0,'name': 'Y_F_10','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_11\"','length': 0,'name': 'Y_F_11','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_12\"','length': 0,'name': 'Y_F_12','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_13\"','length': 0,'name': 'Y_F_13','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_14\"','length': 0,'name': 'Y_F_14','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_15\"','length': 0,'name': 'Y_F_15','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_16\"','length': 0,'name': 'Y_F_16','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_17\"','length': 0,'name': 'Y_F_17','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_18\"','length': 0,'name': 'Y_F_18','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_19\"','length': 0,'name': 'Y_F_19','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_20\"','length': 0,'name': 'Y_F_20','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_21\"','length': 0,'name': 'Y_F_21','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_22\"','length': 0,'name': 'Y_F_22','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_23\"','length': 0,'name': 'Y_F_23','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_24\"','length': 0,'name': 'Y_F_24','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_25\"','length': 0,'name': 'Y_F_25','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_26\"','length': 0,'name': 'Y_F_26','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_27\"','length': 0,'name': 'Y_F_27','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_28\"','length': 0,'name': 'Y_F_28','precision': 0,'type': 6},
-                               {'expression': '\"Y_F_29\"','length': 0,'name': 'Y_F_29','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_0\"','length': 0,'name': 'Y_T_0','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_1\"','length': 0,'name': 'Y_T_1','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_2\"','length': 0,'name': 'Y_T_2','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_3\"','length': 0,'name': 'Y_T_3','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_4\"','length': 0,'name': 'Y_T_4','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_5\"','length': 0,'name': 'Y_T_5','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_6\"','length': 0,'name': 'Y_T_6','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_7\"','length': 0,'name': 'Y_T_7','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_8\"','length': 0,'name': 'Y_T_8','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_9\"','length': 0,'name': 'Y_T_9','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_10\"','length': 0,'name': 'Y_T_10','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_11\"','length': 0,'name': 'Y_T_11','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_12\"','length': 0,'name': 'Y_T_12','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_13\"','length': 0,'name': 'Y_T_13','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_14\"','length': 0,'name': 'Y_T_14','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_15\"','length': 0,'name': 'Y_T_15','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_16\"','length': 0,'name': 'Y_T_16','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_17\"','length': 0,'name': 'Y_T_17','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_18\"','length': 0,'name': 'Y_T_18','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_19\"','length': 0,'name': 'Y_T_19','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_20\"','length': 0,'name': 'Y_T_20','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_21\"','length': 0,'name': 'Y_T_21','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_22\"','length': 0,'name': 'Y_T_22','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_23\"','length': 0,'name': 'Y_T_23','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_24\"','length': 0,'name': 'Y_T_24','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_25\"','length': 0,'name': 'Y_T_25','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_26\"','length': 0,'name': 'Y_T_26','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_27\"','length': 0,'name': 'Y_T_27','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_28\"','length': 0,'name': 'Y_T_28','precision': 0,'type': 6},
-                               {'expression': '\"Y_T_29\"','length': 0,'name': 'Y_T_29','precision': 0,'type': 6}],
+            'FIELDS_MAPPING': field_mapping,
             'INPUT': outputs['JoinAttributesByLocationSections1Through3']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
@@ -860,7 +790,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                                                            feedback=feedback,
                                                            is_child_algorithm=True
                                                            )
-
+        
         feedback.setCurrentStep(32)
         if feedback.isCanceled():
             return {}
