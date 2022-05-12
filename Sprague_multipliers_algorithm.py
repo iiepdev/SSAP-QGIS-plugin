@@ -391,11 +391,11 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
 
         if not parameters['useConstrainedPopulationEstimates']:
-            fn = parameters['isoCountryCode'].lower() + "_f_0_" + str(parameters['year']) + ".tif"
+            fn = parameters['isoCountryCode'].lower() + "_f_0_" + str(parameters['Year']) + ".tif"
         elif parameters['useConstrainedPopulationEstimates'] and not parameters['UseUNadjustedconstrainedestimates']:
-            fn = parameters['isoCountryCode'].lower() + "_f_0_" + str(parameters['year']) + "_constrained.tif"
+            fn = parameters['isoCountryCode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained.tif"
         elif parameters[    'useConstrainedPopulationEstimates'] and parameters['UseUNadjustedconstrainedestimates']:
-            fn = parameters['isoCountryCode'].lower() + "_f_0_" + str(parameters['year']) + "_constrained_UNadj.tif"
+            fn = parameters['isoCountryCode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained_UNadj.tif"
         
         alg_params = {
             'COLUMN_PREFIX': 'F_0_',
@@ -425,7 +425,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                     continue
                 else:
                     inputvector = str(count-1)
-                    fn = '_{}_{}_'.format(gender, age[0]) + str(parameters['year'])
+                    fn = '_{}_{}_'.format(gender, age[0]) + str(parameters['Year'])
                     out = '{}{}To{}'.format(gender.upper(), age[0], age[1])
                     if not parameters['useConstrainedPopulationEstimates']:
                         fn = parameters['isoCountryCode'].lower() + fn + ".tif"
@@ -830,7 +830,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             return {}
 
         country_code = parameters['isoCountryCode']
-        year = parameters['year']
+        year = parameters['Year']
         fnParameters = f'Population_estimates_{country_code}{year}Parameters.xlsx'
         fnSchoolAge = f'Population_estimates_{country_code}{year}SchoolAge.xlsx'
         exportParametersToExcel = os.path.join(parameters['foldercontainingtherasterfiles'], fnParameters)
@@ -1162,7 +1162,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         contain lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         """
-        return ''
+        return 'iiep'
 
     def tr(self, string):
         return QCoreApplication.translate('Processing', string)
