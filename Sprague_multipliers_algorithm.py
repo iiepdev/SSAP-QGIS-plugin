@@ -81,7 +81,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Folder containing the raster files
         self.addParameter(
             QgsProcessingParameterFile(
-                'Foldercontainingtherasterfiles',
+                'foldercontainingtherasterfiles',
                 'Folder containing the raster files',
                 behavior=QgsProcessingParameterFile.Folder,
                 fileFilter='All files (*.*)',
@@ -102,14 +102,14 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # 3-letter ISO country code
         self.addParameter(
             QgsProcessingParameterString(
-                'ISOcountrycode',
+                'isoCountryCode',
                 'ISO country code',
                 multiLine=False,
                 defaultValue='COL'
             )
         )
 
-        # Year of analysis
+        # year of analysis
         self.addParameter(
             QgsProcessingParameterNumber(
                 'Year',
@@ -124,7 +124,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Use constrained population estimates boolean
         self.addParameter(
             QgsProcessingParameterBoolean(
-                'Useconstrainedpopulationestimates',
+                'useConstrainedPopulationEstimates',
                 'Use constrained population estimates',
                 defaultValue=False
             )
@@ -151,7 +151,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         #Pre-primary starting age
         param = QgsProcessingParameterNumber(
-            'Preprimarystartingage',
+            'preprimarystartingage',
             'Pre-primary starting age',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
@@ -165,7 +165,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Pre-primary duration
         param = QgsProcessingParameterNumber(
-            'Preprimaryduration',
+            'preprimaryduration',
             'Pre-primary duration',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
@@ -179,7 +179,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Primary starting age
         param = QgsProcessingParameterNumber(
-            'Primarystartingage',
+            'primarystartingage',
             'Primary starting age',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
@@ -192,7 +192,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Primary duration
         param = QgsProcessingParameterNumber(
-            'Primaryduration',
+            'primaryduration',
             'Primary duration',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
@@ -267,7 +267,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Secondary starting age
         param = QgsProcessingParameterNumber(
-            'Secondarystartingage',
+            'secondarystartingage',
             'Secondary starting age',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
@@ -280,7 +280,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Secondary duration
         param = QgsProcessingParameterNumber(
-            'Secondaryduration',
+            'secondaryduration',
             'Secondary duration',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
@@ -310,35 +310,35 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         results = {}
         outputs = {}
 
-        ISOCountryCode = self.parameterAsString(parameters,
-                                                'ISOcountrycode',
+        isoCountryCode = self.parameterAsString(parameters,
+                                                'isoCountryCode',
                                                 context)
-        Year = self.parameterAsInt(parameters,
+        year = self.parameterAsInt(parameters,
                                    'Year',
                                    context)
-        UseConstrainedPopulationEstimates = self.parameterAsBool(parameters,
-                                                                 'Useconstrainedpopulationestimates',
+        useConstrainedPopulationEstimates = self.parameterAsBool(parameters,
+                                                                 'useConstrainedPopulationEstimates',
                                                                  context)
-        UseUNAdjustedConstrainedPopulationEstimates = self.parameterAsBool(parameters,
+        useUNAdjustedConstrainedPopulationEstimates = self.parameterAsBool(parameters,
                                                                            'UseUNadjustedconstrainedestimates',
                                                                            context)
-        CreateCustomAgeGroups = self.parameterAsBool(parameters,
+        createCustomAgeGroups = self.parameterAsBool(parameters,
                                                      'Createcustomschoolagegroups',
                                                      context)
-        DivideLowerUpperSecondary = self.parameterAsBool(parameters,
+        divideLowerUpperSecondary = self.parameterAsBool(parameters,
                                                          'SystemdividedinLowerandUppersecondary',
                                                          context)
-        Preprimarystartingage = self.parameterAsInt(parameters,
-                                                    'Preprimarystartingage',
+        preprimarystartingage = self.parameterAsInt(parameters,
+                                                    'preprimarystartingage',
                                                     context)
-        Preprimaryduration = self.parameterAsInt(parameters,
-                                                 'Preprimaryduration',
+        preprimaryduration = self.parameterAsInt(parameters,
+                                                 'preprimaryduration',
                                                  context)
-        Primarystartingage = self.parameterAsInt(parameters,
-                                                 'Primarystartingage',
+        primarystartingage = self.parameterAsInt(parameters,
+                                                 'primarystartingage',
                                                  context)
-        Primaryduration = self.parameterAsInt(parameters,
-                                              'Primaryduration',
+        primaryduration = self.parameterAsInt(parameters,
+                                              'primaryduration',
                                               context)
         Lowersecondarystartingage = self.parameterAsInt(parameters,
                                                         'Lowersecondarystartingage',
@@ -352,22 +352,22 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         Uppersecondaryduration = self.parameterAsInt(parameters,
                                                      'Uppersecondaryduration',
                                                      context)
-        Secondarystartingage = self.parameterAsInt(parameters,
-                                                   'Secondarystartingage',
+        secondarystartingage = self.parameterAsInt(parameters,
+                                                   'secondarystartingage',
                                                    context)
-        Secondaryduration = self.parameterAsInt(parameters,
-                                                'Secondaryduration',
+        secondaryduration = self.parameterAsInt(parameters,
+                                                'secondaryduration',
                                                 context)
-        Foldercontainingtherasterfiles = self.parameterAsString(parameters,
-                                                                'Foldercontainingtherasterfiles',
+        foldercontainingtherasterfiles = self.parameterAsString(parameters,
+                                                                'foldercontainingtherasterfiles',
                                                                 context)
 
         # Providing warnings in case some of the optional values was not specified
         if parameters['Createcustomschoolagegroups'] and \
-           (parameters['Preprimarystartingage'] is None or \
-            parameters['Preprimaryduration'] is None or \
-            parameters['Primarystartingage'] is None or \
-            parameters['Primaryduration'] is None):
+           (parameters['preprimarystartingage'] is None or \
+            parameters['preprimaryduration'] is None or \
+            parameters['primarystartingage'] is None or \
+            parameters['primaryduration'] is None):
             feedback.pushWarning(f'You have selected the option "Create custom school age groups". \
             However, it looks like you failed to provide starting age or duration for at least one of the levels. \
             The code might fail to create the desired columns')
@@ -382,25 +382,25 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             The code might fail to create the desired columns')
         if parameters['Createcustomschoolagegroups'] and \
         not parameters['SystemdividedinLowerandUppersecondary'] and \
-           (parameters['Secondarystartingage'] is None or \
-            parameters['Secondaryduration'] is None):
+           (parameters['secondarystartingage'] is None or \
+            parameters['secondaryduration'] is None):
             feedback.pushWarning(f'You have not selected the option "System divided in Lower and Upper secondary". \
             However, it looks like you failed to provide starting age or duration for the Secondary level. \
             The code might fail to create the desired columns')
 
 
 
-        if not parameters['Useconstrainedpopulationestimates']:
-            fn = parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + ".tif"
-        elif parameters['Useconstrainedpopulationestimates'] and not parameters['UseUNadjustedconstrainedestimates']:
-            fn = parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained.tif"
-        elif parameters[    'Useconstrainedpopulationestimates'] and parameters['UseUNadjustedconstrainedestimates']:
-            fn = parameters['ISOcountrycode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained_UNadj.tif"
+        if not parameters['useConstrainedPopulationEstimates']:
+            fn = parameters['isoCountryCode'].lower() + "_f_0_" + str(parameters['year']) + ".tif"
+        elif parameters['useConstrainedPopulationEstimates'] and not parameters['UseUNadjustedconstrainedestimates']:
+            fn = parameters['isoCountryCode'].lower() + "_f_0_" + str(parameters['year']) + "_constrained.tif"
+        elif parameters[    'useConstrainedPopulationEstimates'] and parameters['UseUNadjustedconstrainedestimates']:
+            fn = parameters['isoCountryCode'].lower() + "_f_0_" + str(parameters['year']) + "_constrained_UNadj.tif"
         
         alg_params = {
             'COLUMN_PREFIX': 'F_0_',
             'INPUT': parameters['Administrativeboundaries'],
-            'INPUT_RASTER': os.path.join(Foldercontainingtherasterfiles, fn),
+            'INPUT_RASTER': os.path.join(foldercontainingtherasterfiles, fn),
             'RASTER_BAND': 1,
             'STATISTICS': [1],  # Sum
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
@@ -415,28 +415,28 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         feedback.setCurrentStep(1)        
 
-        Genders = ['f', 'm']
-        Ages = [['0', '1'], ['1', '4'], ['5', '9'], ['10', '14'], ['15', '19'], ['20', '24'], ['25', '29'], ['30', '34'], ['35', '39']]
+        genders = ['f', 'm']
+        ages = [['0', '1'], ['1', '4'], ['5', '9'], ['10', '14'], ['15', '19'], ['20', '24'], ['25', '29'], ['30', '34'], ['35', '39']]
 
         count = 2
-        for Gender in Genders:
-            for Age in Ages:
-                if Gender=='f' and Age[0]=='0':
+        for gender in genders:
+            for age in ages:
+                if gender=='f' and age[0]=='0':
                     continue
                 else:
                     inputvector = str(count-1)
-                    fn = '_{}_{}_'.format(Gender, Age[0]) + str(parameters['Year'])
-                    out = '{}{}To{}'.format(Gender.upper(), Age[0], Age[1])
-                    if not parameters['Useconstrainedpopulationestimates']:
-                        fn = parameters['ISOcountrycode'].lower() + fn + ".tif"
-                    elif parameters['Useconstrainedpopulationestimates'] and not parameters['UseUNadjustedconstrainedestimates']:
-                        fn = parameters['ISOcountrycode'].lower() + fn + "_constrained.tif"
-                    elif parameters['Useconstrainedpopulationestimates'] and parameters['UseUNadjustedconstrainedestimates']:
-                        fn = parameters['ISOcountrycode'].lower() + fn + "_constrained_UNadj.tif"
+                    fn = '_{}_{}_'.format(gender, age[0]) + str(parameters['year'])
+                    out = '{}{}To{}'.format(gender.upper(), age[0], age[1])
+                    if not parameters['useConstrainedPopulationEstimates']:
+                        fn = parameters['isoCountryCode'].lower() + fn + ".tif"
+                    elif parameters['useConstrainedPopulationEstimates'] and not parameters['UseUNadjustedconstrainedestimates']:
+                        fn = parameters['isoCountryCode'].lower() + fn + "_constrained.tif"
+                    elif parameters['useConstrainedPopulationEstimates'] and parameters['UseUNadjustedconstrainedestimates']:
+                        fn = parameters['isoCountryCode'].lower() + fn + "_constrained_UNadj.tif"
                     alg_params = {
-                        'COLUMN_PREFIX': '{}_{}_'.format(Gender.upper(), Age[0]),
+                        'COLUMN_PREFIX': '{}_{}_'.format(gender.upper(), age[0]),
                         'INPUT': outputs[inputvector]['OUTPUT'],
-                        'INPUT_RASTER': os.path.join(Foldercontainingtherasterfiles, fn),
+                        'INPUT_RASTER': os.path.join(foldercontainingtherasterfiles, fn),
                         'RASTER_BAND': 1,
                         'STATISTICS': [1],  # Sum
                         'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
@@ -570,7 +570,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'INPUT': outputs['CreateSpatialIndexSection0']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['CalculatingSingleYearsOfAgeSection1'] = processing.run('native:refactorfields',
+        outputs['CalculatingSingleyearsOfAgeSection1'] = processing.run('native:refactorfields',
                                                                         alg_params,
                                                                         context=context,
                                                                         feedback=feedback,
@@ -583,7 +583,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Create spatial index - Section 1
         alg_params = {
-            'INPUT': outputs['CalculatingSingleYearsOfAgeSection1']['OUTPUT']
+            'INPUT': outputs['CalculatingSingleyearsOfAgeSection1']['OUTPUT']
         }
         outputs['CreateSpatialIndexSection1'] = processing.run('native:createspatialindex',
                                                                alg_params,
@@ -637,7 +637,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'INPUT': outputs['CreateSpatialIndexSection1']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['CalculatingSingleYearsOfAgeSection2'] = processing.run('native:refactorfields',
+        outputs['CalculatingSingleyearsOfAgeSection2'] = processing.run('native:refactorfields',
                                                                         alg_params,
                                                                         context=context,
                                                                         feedback=feedback,
@@ -656,10 +656,10 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                                {'expression': '\"Y_M_19\" + \"Y_F_19\"','length': 0,'name': 'Y_T_19','precision': 0,'type': 6},
                                {'expression': '\"Y_M_24\" + \"Y_F_24\"','length': 0,'name': 'Y_T_24','precision': 0,'type': 6},
                                {'expression': '\"Y_M_29\" + \"Y_F_29\"','length': 0,'name': 'Y_T_29','precision': 0,'type': 6}],
-            'INPUT': outputs['CalculatingSingleYearsOfAgeSection2']['OUTPUT'],
+            'INPUT': outputs['CalculatingSingleyearsOfAgeSection2']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
-        outputs['CalculatingSingleYearsOfAgeSection3'] = processing.run('native:refactorfields',
+        outputs['CalculatingSingleyearsOfAgeSection3'] = processing.run('native:refactorfields',
                                                                         alg_params,
                                                                         context=context,
                                                                         feedback=feedback,
@@ -672,7 +672,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Create spatial index - Section 2
         alg_params = {
-            'INPUT': outputs['CalculatingSingleYearsOfAgeSection2']['OUTPUT']
+            'INPUT': outputs['CalculatingSingleyearsOfAgeSection2']['OUTPUT']
         }
         outputs['CreateSpatialIndexSection2'] = processing.run('native:createspatialindex',
                                                                alg_params,
@@ -687,7 +687,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Create spatial index - Section 3
         alg_params = {
-            'INPUT': outputs['CalculatingSingleYearsOfAgeSection3']['OUTPUT']
+            'INPUT': outputs['CalculatingSingleyearsOfAgeSection3']['OUTPUT']
         }
         outputs['CreateSpatialIndexSection3'] = processing.run('native:createspatialindex',
                                                                alg_params,
@@ -761,14 +761,13 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Reorganizing the results
 
-        Genders = ["M", "F", "T"]
+        genders = ["M", "F", "T"]
         field_mapping = []
-        
-        for Gender in Genders:
-            for Age in range(0,30):
+        for gender in genders:
+            for age in range(0,30):
 
-                expression_level = '"Y_' + Gender + '_' + str(Age) + '"'
-                expression_precision = 'Y_' + Gender + '_' + str(Age)
+                expression_level = '"Y_' + gender + '_' + str(age) + '"'
+                expression_precision = 'Y_' + gender + '_' + str(age)
 
                 expression = {}
                 expression['expression']= expression_level
@@ -790,7 +789,6 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                                                            feedback=feedback,
                                                            is_child_algorithm=True
                                                            )
-        
         feedback.setCurrentStep(32)
         if feedback.isCanceled():
             return {}
@@ -831,116 +829,49 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
 
-        country_code = parameters['ISOcountrycode']
-        year = parameters['Year']
+        country_code = parameters['isoCountryCode']
+        year = parameters['year']
         fnParameters = f'Population_estimates_{country_code}{year}Parameters.xlsx'
         fnSchoolAge = f'Population_estimates_{country_code}{year}SchoolAge.xlsx'
-        exportParametersToExcel = os.path.join(parameters['Foldercontainingtherasterfiles'], fnParameters)
-        exportSchoolAge = os.path.join(parameters['Foldercontainingtherasterfiles'], fnSchoolAge)
+        exportParametersToExcel = os.path.join(parameters['foldercontainingtherasterfiles'], fnParameters)
+        exportSchoolAge = os.path.join(parameters['foldercontainingtherasterfiles'], fnSchoolAge)
 
         if parameters['Createcustomschoolagegroups'] and not parameters['SystemdividedinLowerandUppersecondary']:
 
             # Calculating school ages with Secondary
+            genders = ["M", "F", "T"]
+            levels = ["Preprimary", "Primary", "Secondary"]
+            field_mapping = []
+            for gender in genders:
+                for age in range(0,30):
+
+                    expression_expression = '"Y_' + gender + '_' + str(age) + '"'
+                    expression_name = 'Y_' + gender + '_' + str(age)
+
+                    expression = {}
+                    expression['expression']= expression_expression
+                    expression['length']=0
+                    expression['name']=expression_name
+                    expression['precision']=0
+                    expression['type']=6
+
+                    field_mapping.append(expression)
+
+
+            special = [{'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_F','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_M','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_T','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_F','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_M','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_T','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(secondarystartingage, secondaryduration, secondarystartingage),'length': 0,'name': 'Sec_F','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(secondarystartingage, secondaryduration, secondarystartingage),'length': 0,'name': 'Sec_M','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(secondarystartingage, secondaryduration, secondarystartingage),'length': 0,'name': 'Sec_T','precision': 0,'type': 6}]    
+
+            field_mapping = field_mapping + special 
+
             alg_params = {
-                'FIELDS_MAPPING': [{'expression': '\"Y_M_0\"','length': 0,'name': 'Y_M_0','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_1\"','length': 0,'name': 'Y_M_1','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_2\"','length': 0,'name': 'Y_M_2','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_3\"','length': 0,'name': 'Y_M_3','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_4\"','length': 0,'name': 'Y_M_4','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_5\"','length': 0,'name': 'Y_M_5','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_6\"','length': 0,'name': 'Y_M_6','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_7\"','length': 0,'name': 'Y_M_7','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_8\"','length': 0,'name': 'Y_M_8','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_9\"','length': 0,'name': 'Y_M_9','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_10\"','length': 0,'name': 'Y_M_10','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_11\"','length': 0,'name': 'Y_M_11','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_12\"','length': 0,'name': 'Y_M_12','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_13\"','length': 0,'name': 'Y_M_13','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_14\"','length': 0,'name': 'Y_M_14','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_15\"','length': 0,'name': 'Y_M_15','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_16\"','length': 0,'name': 'Y_M_16','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_17\"','length': 0,'name': 'Y_M_17','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_18\"','length': 0,'name': 'Y_M_18','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_19\"','length': 0,'name': 'Y_M_19','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_20\"','length': 0,'name': 'Y_M_20','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_21\"','length': 0,'name': 'Y_M_21','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_22\"','length': 0,'name': 'Y_M_22','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_23\"','length': 0,'name': 'Y_M_23','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_24\"','length': 0,'name': 'Y_M_24','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_25\"','length': 0,'name': 'Y_M_25','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_26\"','length': 0,'name': 'Y_M_26','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_27\"','length': 0,'name': 'Y_M_27','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_28\"','length': 0,'name': 'Y_M_28','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_29\"','length': 0,'name': 'Y_M_29','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_0\"','length': 0,'name': 'Y_F_0','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_1\"','length': 0,'name': 'Y_F_1','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_2\"','length': 0,'name': 'Y_F_2','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_3\"','length': 0,'name': 'Y_F_3','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_4\"','length': 0,'name': 'Y_F_4','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_5\"','length': 0,'name': 'Y_F_5','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_6\"','length': 0,'name': 'Y_F_6','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_7\"','length': 0,'name': 'Y_F_7','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_8\"','length': 0,'name': 'Y_F_8','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_9\"','length': 0,'name': 'Y_F_9','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_10\"','length': 0,'name': 'Y_F_10','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_11\"','length': 0,'name': 'Y_F_11','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_12\"','length': 0,'name': 'Y_F_12','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_13\"','length': 0,'name': 'Y_F_13','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_14\"','length': 0,'name': 'Y_F_14','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_15\"','length': 0,'name': 'Y_F_15','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_16\"','length': 0,'name': 'Y_F_16','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_17\"','length': 0,'name': 'Y_F_17','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_18\"','length': 0,'name': 'Y_F_18','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_19\"','length': 0,'name': 'Y_F_19','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_20\"','length': 0,'name': 'Y_F_20','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_21\"','length': 0,'name': 'Y_F_21','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_22\"','length': 0,'name': 'Y_F_22','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_23\"','length': 0,'name': 'Y_F_23','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_24\"','length': 0,'name': 'Y_F_24','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_25\"','length': 0,'name': 'Y_F_25','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_26\"','length': 0,'name': 'Y_F_26','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_27\"','length': 0,'name': 'Y_F_27','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_28\"','length': 0,'name': 'Y_F_28','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_29\"','length': 0,'name': 'Y_F_29','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_0\"','length': 0,'name': 'Y_T_0','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_1\"','length': 0,'name': 'Y_T_1','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_2\"','length': 0,'name': 'Y_T_2','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_3\"','length': 0,'name': 'Y_T_3','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_4\"','length': 0,'name': 'Y_T_4','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_5\"','length': 0,'name': 'Y_T_5','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_6\"','length': 0,'name': 'Y_T_6','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_7\"','length': 0,'name': 'Y_T_7','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_8\"','length': 0,'name': 'Y_T_8','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_9\"','length': 0,'name': 'Y_T_9','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_10\"','length': 0,'name': 'Y_T_10','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_11\"','length': 0,'name': 'Y_T_11','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_12\"','length': 0,'name': 'Y_T_12','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_13\"','length': 0,'name': 'Y_T_13','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_14\"','length': 0,'name': 'Y_T_14','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_15\"','length': 0,'name': 'Y_T_15','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_16\"','length': 0,'name': 'Y_T_16','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_17\"','length': 0,'name': 'Y_T_17','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_18\"','length': 0,'name': 'Y_T_18','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_19\"','length': 0,'name': 'Y_T_19','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_20\"','length': 0,'name': 'Y_T_20','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_21\"','length': 0,'name': 'Y_T_21','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_22\"','length': 0,'name': 'Y_T_22','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_23\"','length': 0,'name': 'Y_T_23','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_24\"','length': 0,'name': 'Y_T_24','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_25\"','length': 0,'name': 'Y_T_25','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_26\"','length': 0,'name': 'Y_T_26','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_27\"','length': 0,'name': 'Y_T_27','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_28\"','length': 0,'name': 'Y_T_28','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_29\"','length': 0,'name': 'Y_T_29','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_T','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_T','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Secondarystartingage, Secondaryduration, Secondarystartingage),'length': 0,'name': 'Sec_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Secondarystartingage, Secondaryduration, Secondarystartingage),'length': 0,'name': 'Sec_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Secondarystartingage, Secondaryduration, Secondarystartingage),'length': 0,'name': 'Sec_T','precision': 0,'type': 6}],
+                'FIELDS_MAPPING': field_mapping,
                 'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
@@ -958,12 +889,12 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
             # Preparing the table to export the parameters - Secondary
             alg_params = {
-                'FIELDS_MAPPING': [{'expression': parameters['ISOcountrycode'].lower(),'length': 10,'name': 'ISO country code','precision': 0,'type': 10},
-                                   {'expression': Year,'length': 0,'name': 'Year','precision': 0,'type': 2},
-                                   {'expression': Preprimarystartingage,'length': 0,'name': 'Pre-primary starting age','precision': 0,'type': 2},
-                                   {'expression': Preprimaryduration,'length': 0,'name': 'Pre-primary duration','precision': 0,'type': 2},
-                                   {'expression': Primarystartingage,'length': 0,'name': 'Primary starting age','precision': 0,'type': 2},
-                                   {'expression': Primaryduration,'length': 0,'name': 'Primary duration','precision': 0,'type': 2},
+                'FIELDS_MAPPING': [{'expression': parameters['isoCountryCode'].lower(),'length': 10,'name': 'ISO country code','precision': 0,'type': 10},
+                                   {'expression': year,'length': 0,'name': 'year','precision': 0,'type': 2},
+                                   {'expression': preprimarystartingage,'length': 0,'name': 'Pre-primary starting age','precision': 0,'type': 2},
+                                   {'expression': preprimaryduration,'length': 0,'name': 'Pre-primary duration','precision': 0,'type': 2},
+                                   {'expression': primarystartingage,'length': 0,'name': 'Primary starting age','precision': 0,'type': 2},
+                                   {'expression': primaryduration,'length': 0,'name': 'Primary duration','precision': 0,'type': 2},
                                    {'expression': Lowersecondarystartingage,'length': 0,'name': 'Lower secondary starting age','precision': 0,'type': 2},
                                    {'expression': Lowersecondaryduration,'length': 0,'name': 'Lower secondary duration','precision': 0,'type': 2},
                                    {'expression': Uppersecondarystartingage,'length': 0,'name': 'Upper secondary starting age','precision': 0,'type': 2},
@@ -985,109 +916,41 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         if parameters['Createcustomschoolagegroups'] and parameters['SystemdividedinLowerandUppersecondary']:
 
             # Calculating school ages with Lower and Upper secondary
+            genders = ["M", "F", "T"]
+            levels = ["Preprimary", "Primary", "Lowersecondary", "Uppersecondary"]
+            field_mapping = []
+            for gender in genders:
+                for age in range(0,30):
+
+                    expression_expression = '"Y_' + gender + '_' + str(age) + '"'
+                    expression_name = 'Y_' + gender + '_' + str(age)
+
+                    expression = {}
+                    expression['expression']= expression_expression
+                    expression['length']=0
+                    expression['name']=expression_name
+                    expression['precision']=0
+                    expression['type']=6
+
+                    field_mapping.append(expression)
+
+            special = [{'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_F','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_M','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_T','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_F','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_M','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_T','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_F','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_M','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_T','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_F','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_M','precision': 0,'type': 6},
+            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_T','precision': 0,'type': 6}]          
+
+            field_mapping = field_mapping + special
+            
             alg_params = {
-                'FIELDS_MAPPING': [{'expression': '\"Y_M_0\"','length': 0,'name': 'Y_M_0','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_1\"','length': 0,'name': 'Y_M_1','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_2\"','length': 0,'name': 'Y_M_2','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_3\"','length': 0,'name': 'Y_M_3','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_4\"','length': 0,'name': 'Y_M_4','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_5\"','length': 0,'name': 'Y_M_5','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_6\"','length': 0,'name': 'Y_M_6','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_7\"','length': 0,'name': 'Y_M_7','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_8\"','length': 0,'name': 'Y_M_8','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_9\"','length': 0,'name': 'Y_M_9','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_10\"','length': 0,'name': 'Y_M_10','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_11\"','length': 0,'name': 'Y_M_11','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_12\"','length': 0,'name': 'Y_M_12','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_13\"','length': 0,'name': 'Y_M_13','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_14\"','length': 0,'name': 'Y_M_14','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_15\"','length': 0,'name': 'Y_M_15','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_16\"','length': 0,'name': 'Y_M_16','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_17\"','length': 0,'name': 'Y_M_17','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_18\"','length': 0,'name': 'Y_M_18','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_19\"','length': 0,'name': 'Y_M_19','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_20\"','length': 0,'name': 'Y_M_20','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_21\"','length': 0,'name': 'Y_M_21','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_22\"','length': 0,'name': 'Y_M_22','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_23\"','length': 0,'name': 'Y_M_23','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_24\"','length': 0,'name': 'Y_M_24','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_25\"','length': 0,'name': 'Y_M_25','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_26\"','length': 0,'name': 'Y_M_26','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_27\"','length': 0,'name': 'Y_M_27','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_28\"','length': 0,'name': 'Y_M_28','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_29\"','length': 0,'name': 'Y_M_29','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_0\"','length': 0,'name': 'Y_F_0','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_1\"','length': 0,'name': 'Y_F_1','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_2\"','length': 0,'name': 'Y_F_2','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_3\"','length': 0,'name': 'Y_F_3','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_4\"','length': 0,'name': 'Y_F_4','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_5\"','length': 0,'name': 'Y_F_5','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_6\"','length': 0,'name': 'Y_F_6','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_7\"','length': 0,'name': 'Y_F_7','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_8\"','length': 0,'name': 'Y_F_8','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_9\"','length': 0,'name': 'Y_F_9','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_10\"','length': 0,'name': 'Y_F_10','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_11\"','length': 0,'name': 'Y_F_11','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_12\"','length': 0,'name': 'Y_F_12','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_13\"','length': 0,'name': 'Y_F_13','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_14\"','length': 0,'name': 'Y_F_14','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_15\"','length': 0,'name': 'Y_F_15','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_16\"','length': 0,'name': 'Y_F_16','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_17\"','length': 0,'name': 'Y_F_17','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_18\"','length': 0,'name': 'Y_F_18','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_19\"','length': 0,'name': 'Y_F_19','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_20\"','length': 0,'name': 'Y_F_20','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_21\"','length': 0,'name': 'Y_F_21','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_22\"','length': 0,'name': 'Y_F_22','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_23\"','length': 0,'name': 'Y_F_23','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_24\"','length': 0,'name': 'Y_F_24','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_25\"','length': 0,'name': 'Y_F_25','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_26\"','length': 0,'name': 'Y_F_26','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_27\"','length': 0,'name': 'Y_F_27','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_28\"','length': 0,'name': 'Y_F_28','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_29\"','length': 0,'name': 'Y_F_29','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_0\"','length': 0,'name': 'Y_T_0','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_1\"','length': 0,'name': 'Y_T_1','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_2\"','length': 0,'name': 'Y_T_2','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_3\"','length': 0,'name': 'Y_T_3','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_4\"','length': 0,'name': 'Y_T_4','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_5\"','length': 0,'name': 'Y_T_5','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_6\"','length': 0,'name': 'Y_T_6','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_7\"','length': 0,'name': 'Y_T_7','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_8\"','length': 0,'name': 'Y_T_8','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_9\"','length': 0,'name': 'Y_T_9','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_10\"','length': 0,'name': 'Y_T_10','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_11\"','length': 0,'name': 'Y_T_11','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_12\"','length': 0,'name': 'Y_T_12','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_13\"','length': 0,'name': 'Y_T_13','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_14\"','length': 0,'name': 'Y_T_14','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_15\"','length': 0,'name': 'Y_T_15','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_16\"','length': 0,'name': 'Y_T_16','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_17\"','length': 0,'name': 'Y_T_17','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_18\"','length': 0,'name': 'Y_T_18','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_19\"','length': 0,'name': 'Y_T_19','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_20\"','length': 0,'name': 'Y_T_20','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_21\"','length': 0,'name': 'Y_T_21','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_22\"','length': 0,'name': 'Y_T_22','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_23\"','length': 0,'name': 'Y_T_23','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_24\"','length': 0,'name': 'Y_T_24','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_25\"','length': 0,'name': 'Y_T_25','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_26\"','length': 0,'name': 'Y_T_26','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_27\"','length': 0,'name': 'Y_T_27','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_28\"','length': 0,'name': 'Y_T_28','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_29\"','length': 0,'name': 'Y_T_29','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Preprimarystartingage, Preprimaryduration, Preprimarystartingage),'length': 0,'name': 'Pre_primary_T','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Primarystartingage, Primaryduration, Primarystartingage),'length': 0,'name': 'Primary_T','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_T','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_F','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_M','precision': 0,'type': 6},
-                                   {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_T','precision': 0,'type': 6}],
+                'FIELDS_MAPPING': field_mapping,
                 'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
@@ -1104,14 +967,14 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
             # Preparing the table to export the parameters - Lower and Upper secondary
             alg_params = {
-                'FIELDS_MAPPING': [{'expression': parameters['ISOcountrycode'].lower(),'length': 10,'name': 'ISO country code','precision': 0,'type': 10},
-                                   {'expression': Year,'length': 0,'name': 'Year','precision': 0,'type': 2},
-                                   {'expression': Preprimarystartingage,'length': 0,'name': 'Pre-primary starting age','precision': 0,'type': 2},
-                                   {'expression': Preprimaryduration,'length': 0,'name': 'Pre-primary duration','precision': 0,'type': 2},
-                                   {'expression': Primarystartingage,'length': 0,'name': 'Primary starting age','precision': 0,'type': 2},
-                                   {'expression': Primaryduration,'length': 0,'name': 'Primary duration','precision': 0,'type': 2},
-                                   {'expression': Secondarystartingage,'length': 0,'name': 'Secondary starting age','precision': 0,'type': 2},
-                                   {'expression': Secondaryduration,'length': 0,'name': 'Secondary duration','precision': 0,'type': 2}],
+                'FIELDS_MAPPING': [{'expression': parameters['isoCountryCode'].lower(),'length': 10,'name': 'ISO country code','precision': 0,'type': 10},
+                                   {'expression': year,'length': 0,'name': 'year','precision': 0,'type': 2},
+                                   {'expression': preprimarystartingage,'length': 0,'name': 'Pre-primary starting age','precision': 0,'type': 2},
+                                   {'expression': preprimaryduration,'length': 0,'name': 'Pre-primary duration','precision': 0,'type': 2},
+                                   {'expression': primarystartingage,'length': 0,'name': 'Primary starting age','precision': 0,'type': 2},
+                                   {'expression': primaryduration,'length': 0,'name': 'Primary duration','precision': 0,'type': 2},
+                                   {'expression': secondarystartingage,'length': 0,'name': 'Secondary starting age','precision': 0,'type': 2},
+                                   {'expression': secondaryduration,'length': 0,'name': 'Secondary duration','precision': 0,'type': 2}],
                 'INPUT': outputs['RandomPointsInExtent']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
@@ -1130,97 +993,25 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
 
             # Calculating school ages 
+            genders = ["M", "F", "T"]
+            field_mapping = []
+            for gender in genders:
+                for age in range(0,30):
+
+                    expression_level = '"Y_' + gender + '_' + str(age) + '"'
+                    expression_precision = 'Y_' + gender + '_' + str(age)
+
+                    expression = {}
+                    expression['expression']= expression_level
+                    expression['length']=0
+                    expression['name']=expression_precision
+                    expression['precision']=0
+                    expression['type']=6
+
+                    field_mapping.append(expression)
+            
             alg_params = {
-                'FIELDS_MAPPING': [{'expression': '\"Y_M_0\"','length': 0,'name': 'Y_M_0','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_1\"','length': 0,'name': 'Y_M_1','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_2\"','length': 0,'name': 'Y_M_2','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_3\"','length': 0,'name': 'Y_M_3','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_4\"','length': 0,'name': 'Y_M_4','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_5\"','length': 0,'name': 'Y_M_5','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_6\"','length': 0,'name': 'Y_M_6','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_7\"','length': 0,'name': 'Y_M_7','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_8\"','length': 0,'name': 'Y_M_8','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_9\"','length': 0,'name': 'Y_M_9','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_10\"','length': 0,'name': 'Y_M_10','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_11\"','length': 0,'name': 'Y_M_11','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_12\"','length': 0,'name': 'Y_M_12','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_13\"','length': 0,'name': 'Y_M_13','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_14\"','length': 0,'name': 'Y_M_14','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_15\"','length': 0,'name': 'Y_M_15','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_16\"','length': 0,'name': 'Y_M_16','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_17\"','length': 0,'name': 'Y_M_17','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_18\"','length': 0,'name': 'Y_M_18','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_19\"','length': 0,'name': 'Y_M_19','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_20\"','length': 0,'name': 'Y_M_20','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_21\"','length': 0,'name': 'Y_M_21','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_22\"','length': 0,'name': 'Y_M_22','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_23\"','length': 0,'name': 'Y_M_23','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_24\"','length': 0,'name': 'Y_M_24','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_25\"','length': 0,'name': 'Y_M_25','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_26\"','length': 0,'name': 'Y_M_26','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_27\"','length': 0,'name': 'Y_M_27','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_28\"','length': 0,'name': 'Y_M_28','precision': 0,'type': 6},
-                                   {'expression': '\"Y_M_29\"','length': 0,'name': 'Y_M_29','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_0\"','length': 0,'name': 'Y_F_0','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_1\"','length': 0,'name': 'Y_F_1','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_2\"','length': 0,'name': 'Y_F_2','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_3\"','length': 0,'name': 'Y_F_3','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_4\"','length': 0,'name': 'Y_F_4','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_5\"','length': 0,'name': 'Y_F_5','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_6\"','length': 0,'name': 'Y_F_6','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_7\"','length': 0,'name': 'Y_F_7','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_8\"','length': 0,'name': 'Y_F_8','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_9\"','length': 0,'name': 'Y_F_9','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_10\"','length': 0,'name': 'Y_F_10','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_11\"','length': 0,'name': 'Y_F_11','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_12\"','length': 0,'name': 'Y_F_12','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_13\"','length': 0,'name': 'Y_F_13','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_14\"','length': 0,'name': 'Y_F_14','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_15\"','length': 0,'name': 'Y_F_15','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_16\"','length': 0,'name': 'Y_F_16','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_17\"','length': 0,'name': 'Y_F_17','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_18\"','length': 0,'name': 'Y_F_18','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_19\"','length': 0,'name': 'Y_F_19','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_20\"','length': 0,'name': 'Y_F_20','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_21\"','length': 0,'name': 'Y_F_21','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_22\"','length': 0,'name': 'Y_F_22','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_23\"','length': 0,'name': 'Y_F_23','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_24\"','length': 0,'name': 'Y_F_24','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_25\"','length': 0,'name': 'Y_F_25','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_26\"','length': 0,'name': 'Y_F_26','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_27\"','length': 0,'name': 'Y_F_27','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_28\"','length': 0,'name': 'Y_F_28','precision': 0,'type': 6},
-                                   {'expression': '\"Y_F_29\"','length': 0,'name': 'Y_F_29','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_0\"','length': 0,'name': 'Y_T_0','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_1\"','length': 0,'name': 'Y_T_1','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_2\"','length': 0,'name': 'Y_T_2','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_3\"','length': 0,'name': 'Y_T_3','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_4\"','length': 0,'name': 'Y_T_4','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_5\"','length': 0,'name': 'Y_T_5','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_6\"','length': 0,'name': 'Y_T_6','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_7\"','length': 0,'name': 'Y_T_7','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_8\"','length': 0,'name': 'Y_T_8','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_9\"','length': 0,'name': 'Y_T_9','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_10\"','length': 0,'name': 'Y_T_10','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_11\"','length': 0,'name': 'Y_T_11','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_12\"','length': 0,'name': 'Y_T_12','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_13\"','length': 0,'name': 'Y_T_13','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_14\"','length': 0,'name': 'Y_T_14','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_15\"','length': 0,'name': 'Y_T_15','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_16\"','length': 0,'name': 'Y_T_16','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_17\"','length': 0,'name': 'Y_T_17','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_18\"','length': 0,'name': 'Y_T_18','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_19\"','length': 0,'name': 'Y_T_19','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_20\"','length': 0,'name': 'Y_T_20','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_21\"','length': 0,'name': 'Y_T_21','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_22\"','length': 0,'name': 'Y_T_22','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_23\"','length': 0,'name': 'Y_T_23','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_24\"','length': 0,'name': 'Y_T_24','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_25\"','length': 0,'name': 'Y_T_25','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_26\"','length': 0,'name': 'Y_T_26','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_27\"','length': 0,'name': 'Y_T_27','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_28\"','length': 0,'name': 'Y_T_28','precision': 0,'type': 6},
-                                   {'expression': '\"Y_T_29\"','length': 0,'name': 'Y_T_29','precision': 0,'type': 6}],
+                'FIELDS_MAPPING': field_mapping,
                 'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
@@ -1238,8 +1029,8 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
             # Preparing the table to export the parameters
             alg_params = {
-                'FIELDS_MAPPING': [{'expression': parameters['ISOcountrycode'].lower(),'length': 10,'name': 'ISO country code','precision': 0,'type': 10},
-                                   {'expression': Year,'length': 0,'name': 'Year','precision': 0,'type': 2}],
+                'FIELDS_MAPPING': [{'expression': parameters['isoCountryCode'].lower(),'length': 10,'name': 'ISO country code','precision': 0,'type': 10},
+                                   {'expression': year,'length': 0,'name': 'year','precision': 0,'type': 2}],
                 'INPUT': outputs['RandomPointsInExtent']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
@@ -1386,8 +1177,8 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 <p>Polygon layer containing the administrative boundaries on which the single years of age' variables will be calculated. It can also be any other arrangement (e.g. Voronoi polygons).</p>
 <h3>ISO country code</h3>
 <p>3-letter ISO country code</p>
-<h3>Year</h3>
-<p>Year of analysis (e.g. 2014)</p>
+<h3>year</h3>
+<p>year of analysis (e.g. 2014)</p>
 <h3>Use unconstrained population estimates</h3>
 <p></p>
 <h3>Use UN adjusted constrained estimates</h3>
