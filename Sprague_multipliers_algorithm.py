@@ -340,16 +340,16 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         primaryduration = self.parameterAsInt(parameters,
                                               'primaryduration',
                                               context)
-        Lowersecondarystartingage = self.parameterAsInt(parameters,
+        lowersecondarystartingage = self.parameterAsInt(parameters,
                                                         'Lowersecondarystartingage',
                                                         context)
-        Lowersecondaryduration = self.parameterAsInt(parameters,
+        lowersecondaryduration = self.parameterAsInt(parameters,
                                                      'Lowersecondaryduration',
                                                      context)
-        Uppersecondarystartingage = self.parameterAsInt(parameters,
+        uppersecondarystartingage = self.parameterAsInt(parameters,
                                                         'Uppersecondarystartingage',
                                                         context)
-        Uppersecondaryduration = self.parameterAsInt(parameters,
+        uppersecondaryduration = self.parameterAsInt(parameters,
                                                      'Uppersecondaryduration',
                                                      context)
         secondarystartingage = self.parameterAsInt(parameters,
@@ -840,7 +840,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
             # Calculating school ages with Secondary
             genders = ["M", "F", "T"]
-            levels = ["Preprimary", "Primary", "Secondary"]
+            levels = ["preprimary", "primary", "secondary"]
             field_mapping = []
             for gender in genders:
                 for age in range(0,30):
@@ -857,18 +857,25 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
                     field_mapping.append(expression)
 
+            for level in levels:
 
-            special = [{'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_F','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_M','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_T','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_F','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_M','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_T','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(secondarystartingage, secondaryduration, secondarystartingage),'length': 0,'name': 'Sec_F','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(secondarystartingage, secondaryduration, secondarystartingage),'length': 0,'name': 'Sec_M','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(secondarystartingage, secondaryduration, secondarystartingage),'length': 0,'name': 'Sec_T','precision': 0,'type': 6}]    
+                starting = vars()[level + 'startingage']
+                duration = vars()[level + 'duration']
+                            
+                for gender in genders:
 
-            field_mapping = field_mapping + special 
+                    expression_expression = f'eval(array_to_string(array_foreach(generate_series( {starting} ,  {starting} + {duration} - 1),concat(\'Y_{gender}_\',@element)),\'+\'))'
+                    expression_name = level + '_' + gender
+
+                    expression = {}
+                    expression['expression']= expression_expression
+                    expression['length']=0
+                    expression['name']=expression_name
+                    expression['precision']=0
+                    expression['type']=6
+
+
+                    field_mapping.append(expression) 
 
             alg_params = {
                 'FIELDS_MAPPING': field_mapping,
@@ -917,7 +924,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
             # Calculating school ages with Lower and Upper secondary
             genders = ["M", "F", "T"]
-            levels = ["Preprimary", "Primary", "Lowersecondary", "Uppersecondary"]
+            levels = ["preprimary", "primary", "lowersecondary", "uppersecondary"]
             field_mapping = []
             for gender in genders:
                 for age in range(0,30):
@@ -934,20 +941,26 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
                     field_mapping.append(expression)
 
-            special = [{'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_F','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_M','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(preprimarystartingage, preprimaryduration, preprimarystartingage),'length': 0,'name': 'Pre_primary_T','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_F','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_M','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(primarystartingage, primaryduration, primarystartingage),'length': 0,'name': 'Primary_T','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_F','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_M','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Lowersecondarystartingage, Lowersecondaryduration, Lowersecondarystartingage),'length': 0,'name': 'LowSec_T','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_F_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_F','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_M_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_M','precision': 0,'type': 6},
-            {'expression': 'eval(array_to_string(array_foreach(generate_series( {} ,  {} + {} - 1),concat(\'\"Y_T_\',@element,\'\"\')),\'+\'))'.format(Uppersecondarystartingage, Uppersecondaryduration, Uppersecondarystartingage),'length': 0,'name': 'UppSec_T','precision': 0,'type': 6}]          
 
-            field_mapping = field_mapping + special
+            for level in levels:
+
+                starting = vars()[level + 'startingage']
+                duration = vars()[level + 'duration']
+                            
+                for gender in genders:
+
+                    expression_expression = f'eval(array_to_string(array_foreach(generate_series( {starting} ,  {starting} + {duration} - 1),concat(\'Y_{gender}_\',@element)),\'+\'))'
+                    expression_name = level + '_' + gender
+
+                    expression = {}
+                    expression['expression']= expression_expression
+                    expression['length']=0
+                    expression['name']=expression_name
+                    expression['precision']=0
+                    expression['type']=6
+
+
+                    field_mapping.append(expression) 
             
             alg_params = {
                 'FIELDS_MAPPING': field_mapping,
@@ -1162,7 +1175,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         contain lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         """
-        return 'iiep'
+        return ''
 
     def tr(self, string):
         return QCoreApplication.translate('Processing', string)
