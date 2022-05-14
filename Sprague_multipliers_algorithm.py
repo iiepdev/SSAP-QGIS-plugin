@@ -455,23 +455,33 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
 
         # Creating the 0 to 4 age groups
+
+        genders = ["F", "M"]
+        field_mapping = []
+
+        for gender in genders:
+            for i in range(5,40,5):
+            
+                expression_expression = f'\"{gender}_{i}_sum\"'
+                expression_name = f'{gender}_{i}_sum'
+
+                expression = {}
+                expression['expression']= expression_expression
+                expression['length']=0
+                expression['name']=expression_name
+                expression['precision']=0
+                expression['type']=6
+
+                field_mapping.append(expression)
+
+        extra_expression = [{'expression': '\"F_0_sum\" + \"F_1_sum\"','length': 0,'name': 'F_0_sum','precision': 0,'type': 6},
+                    {'expression': '\"M_0_sum\" + \"M_1_sum\"','length': 0,'name': 'M_0_sum','precision': 0,'type': 6}]
+
+        field_mapping = field_mapping + extra_expression
+
+        
         alg_params = {
-            'FIELDS_MAPPING': [{'expression': '\"F_5_sum\"','length': 0,'name': 'F_5_sum','precision': 0,'type': 6},
-                               {'expression': '\"F_10_sum\"','length': 0,'name': 'F_10_sum','precision': 0,'type': 6},
-                               {'expression': '\"F_15_sum\"','length': 0,'name': 'F_15_sum','precision': 0,'type': 6},
-                               {'expression': '\"F_20_sum\"','length': 0,'name': 'F_20_sum','precision': 0,'type': 6},
-                               {'expression': '\"F_25_sum\"','length': 0,'name': 'F_25_sum','precision': 0,'type': 6},
-                               {'expression': '\"F_30_sum\"','length': 0,'name': 'F_30_sum','precision': 0,'type': 6},
-                               {'expression': '\"F_35_sum\"','length': 0,'name': 'F_35_sum','precision': 0,'type': 6},
-                               {'expression': 'M_5_sum','length': 0,'name': 'M_5_sum','precision': 0,'type': 6},
-                               {'expression': 'M_10_sum','length': 0,'name': 'M_10_sum','precision': 0,'type': 6},
-                               {'expression': 'M_15_sum','length': 0,'name': 'M_15_sum','precision': 0,'type': 6},
-                               {'expression': 'M_20_sum','length': 0,'name': 'M_20_sum','precision': 0,'type': 6},
-                               {'expression': 'M_25_sum','length': 0,'name': 'M_25_sum','precision': 0,'type': 6},
-                               {'expression': 'M_30_sum','length': 0,'name': 'M_30_sum','precision': 0,'type': 6},
-                               {'expression': 'M_35_sum','length': 0,'name': 'M_35_sum','precision': 0,'type': 6},
-                               {'expression': '\"F_0_sum\" + \"F_1_sum\"','length': 0,'name': 'F_0_sum','precision': 0,'type': 6},
-                               {'expression': '\"M_0_sum\" + \"M_1_sum\"','length': 0,'name': 'M_0_sum','precision': 0,'type': 6}],
+            'FIELDS_MAPPING': field_mapping,
             'INPUT': outputs['18']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
@@ -597,43 +607,46 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             return {}
 
         # Calculating single years of age - Section 2
+
+        field_mapping = []
+        genders = ["M", "F"]
+        
+        for gender in genders:
+            for i in range(4,34,5):
+
+                expression_expression = f'\"{gender}_{i - 4}_sum\" - \"Y_{gender}_{i - 4}\" - \"Y_{gender}_{i - 3}\" - \"Y_{gender}_{i - 2}\" - \"Y_{gender}_{i - 1}\"'
+                expression_name = f'Y_{gender}_{i}'
+
+                expression = {}
+                expression['expression']= expression_expression
+                expression['length']=0
+                expression['name']=expression_name
+                expression['precision']=0
+                expression['type']=6
+
+                field_mapping.append(expression)
+
+        pass_line = 4
+        for i in range(29):
+            if i == pass_line:
+                pass_line = pass_line + 5
+                continue
+
+            expression_expression = f'\"Y_M_{i}\" + \"Y_F_{i}\"'
+            expression_name = f'Y_T_{i}'
+
+            expression = {}
+            expression['expression']= expression_expression
+            expression['length']=0
+            expression['name']=expression_name
+            expression['precision']=0
+            expression['type']=6
+
+            field_mapping.append(expression)
+            
+        
         alg_params = {
-            'FIELDS_MAPPING': [{'expression': '\"M_0_sum\" - \"Y_M_0\" - \"Y_M_1\" - \"Y_M_2\" - \"Y_M_3\"','length': 0,'name': 'Y_M_4','precision': 0,'type': 6},
-                               {'expression': '\"M_5_sum\" - \"Y_M_5\" - \"Y_M_6\" - \"Y_M_7\" - \"Y_M_8\"','length': 0,'name': 'Y_M_9','precision': 0,'type': 6},
-                               {'expression': '\"M_10_sum\" - \"Y_M_10\" - \"Y_M_11\" - \"Y_M_12\" - \"Y_M_13\"','length': 0,'name': 'Y_M_14','precision': 0,'type': 6},
-                               {'expression': '\"M_15_sum\" - \"Y_M_15\" - \"Y_M_16\" - \"Y_M_17\" - \"Y_M_18\"','length': 0,'name': 'Y_M_19','precision': 0,'type': 6},
-                               {'expression': '\"M_20_sum\" - \"Y_M_20\" - \"Y_M_21\" - \"Y_M_22\" - \"Y_M_23\"','length': 0,'name': 'Y_M_24','precision': 0,'type': 6},
-                               {'expression': '\"M_25_sum\" - \"Y_M_25\" - \"Y_M_26\" - \"Y_M_27\" - \"Y_M_28\"','length': 0,'name': 'Y_M_29','precision': 0,'type': 6},
-                               {'expression': '\"F_0_sum\" - \"Y_F_0\" - \"Y_F_1\" - \"Y_F_2\" - \"Y_F_3\"','length': 0,'name': 'Y_F_4','precision': 0,'type': 6},
-                               {'expression': '\"F_5_sum\" - \"Y_F_5\" - \"Y_F_6\" - \"Y_F_7\" - \"Y_F_8\"','length': 0,'name': 'Y_F_9','precision': 0,'type': 6},
-                               {'expression': '\"F_10_sum\" - \"Y_F_10\" - \"Y_F_11\" - \"Y_F_12\" - \"Y_F_13\"','length': 0,'name': 'Y_F_14','precision': 0,'type': 6},
-                               {'expression': '\"F_15_sum\" - \"Y_F_15\" - \"Y_F_16\" - \"Y_F_17\" - \"Y_F_18\"','length': 0,'name': 'Y_F_19','precision': 0,'type': 6},
-                               {'expression': '\"F_20_sum\" - \"Y_F_20\" - \"Y_F_21\" - \"Y_F_22\" - \"Y_F_23\"','length': 0,'name': 'Y_F_24','precision': 0,'type': 6},
-                               {'expression': '\"F_25_sum\" - \"Y_F_25\" - \"Y_F_26\" - \"Y_F_27\" - \"Y_F_28\"','length': 0,'name': 'Y_F_29','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_0\" + \"Y_F_0\"','length': 0,'name': 'Y_T_0','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_1\" + \"Y_F_1\"','length': 0,'name': 'Y_T_1','precision': 0,'type': 6},
-                               {'expression': ' \"Y_M_2\" + \"Y_F_2\"','length': 0,'name': 'Y_T_2','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_3\" + \"Y_F_3\"','length': 0,'name': 'Y_T_3','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_5\" + \"Y_F_5\"','length': 0,'name': 'Y_T_5','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_6\" + \"Y_F_6\"','length': 0,'name': 'Y_T_6','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_7\" + \"Y_F_7\"','length': 0,'name': 'Y_T_7','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_8\" + \"Y_F_8\"','length': 0,'name': 'Y_T_8','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_10\" + \"Y_F_10\"','length': 0,'name': 'Y_T_10','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_11\" + \"Y_F_11\"','length': 0,'name': 'Y_T_11','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_12\" + \"Y_F_12\"','length': 0,'name': 'Y_T_12','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_13\" + \"Y_F_13\"','length': 0,'name': 'Y_T_13','precision': 0,'type': 6},
-                               {'expression': ' \"Y_M_15\" + \"Y_F_15\"','length': 0,'name': 'Y_T_15','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_16\" + \"Y_F_16\"','length': 0,'name': 'Y_T_16','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_17\" + \"Y_F_17\"','length': 0,'name': 'Y_T_17','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_18\" + \"Y_F_18\"','length': 0,'name': 'Y_T_18','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_20\" + \"Y_F_20\"','length': 0,'name': 'Y_T_20','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_21\" + \"Y_F_21\"','length': 0,'name': 'Y_T_21','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_22\" + \"Y_F_22\"','length': 0,'name': 'Y_T_22','precision': 0,'type': 6},
-                               {'expression': ' \"Y_M_23\" + \"Y_F_23\"','length': 0,'name': 'Y_T_23','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_25\" + \"Y_F_25\"','length': 0,'name': 'Y_T_25','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_26\" + \"Y_F_26\"','length': 0,'name': 'Y_T_26','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_27\" + \"Y_F_27\"','length': 0,'name': 'Y_T_27','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_28\" + \"Y_F_28\"','length': 0,'name': 'Y_T_28','precision': 0,'type': 6}],
+            'FIELDS_MAPPING': field_mapping,
             'INPUT': outputs['CreateSpatialIndexSection1']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
@@ -649,13 +662,25 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             return {}
 
         # Calculating single years of age - Section 3
+
+        field_mapping = []
+
+        for i in range(4,34,5):
+
+            expression_expression = f'\"Y_M_{i}\" + \"Y_F_{i}\"'
+            expression_name = f'Y_T_{i}'
+
+            expression = {}
+            expression['expression']= expression_expression
+            expression['length']=0
+            expression['name']=expression_name
+            expression['precision']=0
+            expression['type']=6
+
+            field_mapping.append(expression)    
+        
         alg_params = {
-            'FIELDS_MAPPING': [{'expression': '\"Y_M_4\" + \"Y_F_4\"','length': 0,'name': 'Y_T_4','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_9\" + \"Y_F_9\"','length': 0,'name': 'Y_T_9','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_14\" + \"Y_F_14\"','length': 0,'name': 'Y_T_14','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_19\" + \"Y_F_19\"','length': 0,'name': 'Y_T_19','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_24\" + \"Y_F_24\"','length': 0,'name': 'Y_T_24','precision': 0,'type': 6},
-                               {'expression': '\"Y_M_29\" + \"Y_F_29\"','length': 0,'name': 'Y_T_29','precision': 0,'type': 6}],
+            'FIELDS_MAPPING': field_mapping,
             'INPUT': outputs['CalculatingSingleyearsOfAgeSection2']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
         }
@@ -764,7 +789,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         genders = ["M", "F", "T"]
         field_mapping = []
         for gender in genders:
-            for age in range(0,30):
+            for age in range(30):
 
                 expression_level = '"Y_' + gender + '_' + str(age) + '"'
                 expression_precision = 'Y_' + gender + '_' + str(age)
