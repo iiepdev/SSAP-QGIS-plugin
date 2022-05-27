@@ -203,19 +203,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
         self.addParameter(param)
 
-        # System divided in Lower and Upper secondary boolean
-        param = QgsProcessingParameterBoolean(
-            'SystemdividedinLowerandUppersecondary',
-            'System divided in Lower and Upper secondary',
-            optional=True,
-            defaultValue=False
-        )
-        param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
-        self.addParameter(param)
-
         # Lower secondary starting age
         param = QgsProcessingParameterNumber(
-            'Lowersecondarystartingage',
+            'lowersecondarystartingage',
             'Lower secondary starting age',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
@@ -228,7 +218,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Lower secondary duration
         param = QgsProcessingParameterNumber(
-            'Lowersecondaryduration',
+            'lowersecondaryduration',
             'Lower secondary duration',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
@@ -241,7 +231,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Upper secondary starting age
         param = QgsProcessingParameterNumber(
-            'Uppersecondarystartingage',
+            'uppersecondarystartingage',
             'Upper secondary starting age',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
@@ -254,34 +244,8 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         # Upper secondary starting age
         param = QgsProcessingParameterNumber(
-            'Uppersecondaryduration',
+            'uppersecondaryduration',
             'Upper secondary duration',
-            optional=True,
-            type=QgsProcessingParameterNumber.Integer,
-            minValue=1,
-            maxValue=8,
-            defaultValue=None
-        )
-        param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
-        self.addParameter(param)
-
-        # Secondary starting age
-        param = QgsProcessingParameterNumber(
-            'secondarystartingage',
-            'Secondary starting age',
-            optional=True,
-            type=QgsProcessingParameterNumber.Integer,
-            minValue=10,
-            maxValue=14,
-            defaultValue=None
-        )
-        param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
-        self.addParameter(param)
-
-        # Secondary duration
-        param = QgsProcessingParameterNumber(
-            'secondaryduration',
-            'Secondary duration',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
             minValue=1,
@@ -325,9 +289,6 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         createCustomAgeGroups = self.parameterAsBool(parameters,
                                                      'Createcustomschoolagegroups',
                                                      context)
-        divideLowerUpperSecondary = self.parameterAsBool(parameters,
-                                                         'SystemdividedinLowerandUppersecondary',
-                                                         context)
         preprimarystartingage = self.parameterAsInt(parameters,
                                                     'preprimarystartingage',
                                                     context)
@@ -352,12 +313,6 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         uppersecondaryduration = self.parameterAsInt(parameters,
                                                      'Uppersecondaryduration',
                                                      context)
-        secondarystartingage = self.parameterAsInt(parameters,
-                                                   'secondarystartingage',
-                                                   context)
-        secondaryduration = self.parameterAsInt(parameters,
-                                                'secondaryduration',
-                                                context)
         foldercontainingtherasterfiles = self.parameterAsString(parameters,
                                                                 'foldercontainingtherasterfiles',
                                                                 context)
@@ -367,25 +322,13 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
            (parameters['preprimarystartingage'] is None or \
             parameters['preprimaryduration'] is None or \
             parameters['primarystartingage'] is None or \
-            parameters['primaryduration'] is None):
+            parameters['primaryduration'] is None or \
+            parameters['lowersecondarystartingage'] is None or \
+            parameters['lowersecondaryduration'] is None or \
+            parameters['uppersecondarystartingage'] is None or \
+            parameters['uppersecondaryduration'] is None):
             feedback.pushWarning(f'You have selected the option "Create custom school age groups". \
             However, it looks like you failed to provide starting age or duration for at least one of the levels. \
-            The code might fail to create the desired columns')
-        if parameters['Createcustomschoolagegroups'] and \
-           parameters['SystemdividedinLowerandUppersecondary'] and \
-           (parameters['Lowersecondarystartingage'] is None or \
-            parameters['Lowersecondaryduration'] is None or \
-            parameters['Uppersecondarystartingage'] is None or \
-            parameters['Uppersecondaryduration'] is None):
-            feedback.pushWarning(f'You have selected the option "System divided in Lower and Upper secondary". \
-            However, it looks like you failed to provide starting age or duration for at least one of the Secondary levels. \
-            The code might fail to create the desired columns')
-        if parameters['Createcustomschoolagegroups'] and \
-        not parameters['SystemdividedinLowerandUppersecondary'] and \
-           (parameters['secondarystartingage'] is None or \
-            parameters['secondaryduration'] is None):
-            feedback.pushWarning(f'You have not selected the option "System divided in Lower and Upper secondary". \
-            However, it looks like you failed to provide starting age or duration for the Secondary level. \
             The code might fail to create the desired columns')
 
 
@@ -492,7 +435,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                                                              is_child_algorithm=True
                                                              )
 
-        results['Results'] = outputs['CreatingThe0To4AgeGroups']['OUTPUT']
+       
 
         feedback.setCurrentStep(21)
         if feedback.isCanceled():
@@ -861,91 +804,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         exportParametersToExcel = os.path.join(parameters['foldercontainingtherasterfiles'], fnParameters)
         exportSchoolAge = os.path.join(parameters['foldercontainingtherasterfiles'], fnSchoolAge)
 
-        if parameters['Createcustomschoolagegroups'] and not parameters['SystemdividedinLowerandUppersecondary']:
-
-            # Calculating school ages with Secondary
-            genders = ["M", "F", "T"]
-            levels = ["preprimary", "primary", "secondary"]
-            field_mapping = []
-            for gender in genders:
-                for age in range(0,30):
-
-                    expression_expression = '"Y_' + gender + '_' + str(age) + '"'
-                    expression_name = 'Y_' + gender + '_' + str(age)
-
-                    expression = {}
-                    expression['expression']= expression_expression
-                    expression['length']=0
-                    expression['name']=expression_name
-                    expression['precision']=0
-                    expression['type']=6
-
-                    field_mapping.append(expression)
-
-            for level in levels:
-
-                starting = vars()[level + 'startingage']
-                duration = vars()[level + 'duration']
-                            
-                for gender in genders:
-
-                    expression_expression = f'eval(array_to_string(array_foreach(generate_series( {starting} ,  {starting} + {duration} - 1),concat(\'Y_{gender}_\',@element)),\'+\'))'
-                    expression_name = level + '_' + gender
-
-                    expression = {}
-                    expression['expression']= expression_expression
-                    expression['length']=0
-                    expression['name']=expression_name
-                    expression['precision']=0
-                    expression['type']=6
-
-
-                    field_mapping.append(expression) 
-
-            alg_params = {
-                'FIELDS_MAPPING': field_mapping,
-                'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
-                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-            }
-            outputs['CalculatingSchoolAges'] = processing.run('native:refactorfields',
-                                                                           alg_params,
-                                                                           context=context,
-                                                                           feedback=feedback,
-                                                                           is_child_algorithm=True
-                                                                           )
-
-            feedback.setCurrentStep(34)
-            if feedback.isCanceled():
-                return {}
-
-
-            # Preparing the table to export the parameters - Secondary
-            alg_params = {
-                'FIELDS_MAPPING': [{'expression': parameters['isoCountryCode'].lower(),'length': 10,'name': 'ISO country code','precision': 0,'type': 10},
-                                   {'expression': year,'length': 0,'name': 'year','precision': 0,'type': 2},
-                                   {'expression': preprimarystartingage,'length': 0,'name': 'Pre-primary starting age','precision': 0,'type': 2},
-                                   {'expression': preprimaryduration,'length': 0,'name': 'Pre-primary duration','precision': 0,'type': 2},
-                                   {'expression': primarystartingage,'length': 0,'name': 'Primary starting age','precision': 0,'type': 2},
-                                   {'expression': primaryduration,'length': 0,'name': 'Primary duration','precision': 0,'type': 2},
-                                   {'expression': Lowersecondarystartingage,'length': 0,'name': 'Lower secondary starting age','precision': 0,'type': 2},
-                                   {'expression': Lowersecondaryduration,'length': 0,'name': 'Lower secondary duration','precision': 0,'type': 2},
-                                   {'expression': Uppersecondarystartingage,'length': 0,'name': 'Upper secondary starting age','precision': 0,'type': 2},
-                                   {'expression': Uppersecondaryduration,'length': 0,'name': 'Upper secondary duration','precision': 0,'type': 2}],
-                'INPUT': outputs['RandomPointsInExtent']['OUTPUT'],
-                'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
-            }
-            outputs['PreparingTheTableToExportTheParameters'] = processing.run('native:refactorfields',
-                                                                                        alg_params,
-                                                                                        context=context,
-                                                                                        feedback=feedback,
-                                                                                        is_child_algorithm=True
-                                                                                        )
-
-            feedback.setCurrentStep(39)
-            if feedback.isCanceled():
-                return {}
-
-        if parameters['Createcustomschoolagegroups'] and parameters['SystemdividedinLowerandUppersecondary']:
+        if parameters['Createcustomschoolagegroups']:
 
             # Calculating school ages with Lower and Upper secondary
             genders = ["M", "F", "T"]
@@ -1011,8 +870,10 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                                    {'expression': preprimaryduration,'length': 0,'name': 'Pre-primary duration','precision': 0,'type': 2},
                                    {'expression': primarystartingage,'length': 0,'name': 'Primary starting age','precision': 0,'type': 2},
                                    {'expression': primaryduration,'length': 0,'name': 'Primary duration','precision': 0,'type': 2},
-                                   {'expression': secondarystartingage,'length': 0,'name': 'Secondary starting age','precision': 0,'type': 2},
-                                   {'expression': secondaryduration,'length': 0,'name': 'Secondary duration','precision': 0,'type': 2}],
+                                   {'expression': lowersecondarystartingage,'length': 0,'name': 'Lower secondary starting age','precision': 0,'type': 2},
+                                   {'expression': lowersecondaryduration,'length': 0,'name': 'Lower secondary duration','precision': 0,'type': 2},
+                                   {'expression': uppersecondarystartingage,'length': 0,'name': 'Upper secondary starting age','precision': 0,'type': 2},
+                                   {'expression': uppersecondaryduration,'length': 0,'name': 'Upper secondary duration','precision': 0,'type': 2}],
                 'INPUT': outputs['RandomPointsInExtent']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
@@ -1067,7 +928,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
             # Preparing the table to export the parameters
             alg_params = {
-                'FIELDS_MAPPING': [{'expression': parameters['isoCountryCode'].lower(),'length': 10,'name': 'ISO country code','precision': 0,'type': 10},
+                'FIELDS_MAPPING': [{'expression': isoCountryCode,'length': 50,'name': 'ISO country code','precision': 0,'type': 10},
                                    {'expression': year,'length': 0,'name': 'year','precision': 0,'type': 2}],
                 'INPUT': outputs['RandomPointsInExtent']['OUTPUT'],
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
@@ -1127,8 +988,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'INPUT': outputs['CreatingTheFileShapefile']['OUTPUT'],
             'LAYER_NAME': '',
             'LAYER_OPTIONS': '',
-            'OUTPUT': exportSchoolAge,
-            'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+            'OUTPUT': exportSchoolAge
         }
         outputs['ExportingTheResultsToExcel'] = processing.run('native:savefeatures',
                                                                alg_params,
@@ -1136,6 +996,8 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                                                                feedback=feedback,
                                                                is_child_algorithm=True
                                                                )
+
+        results['Results'] = outputs['ExportingTheResultsToExcel']['OUTPUT']
 
         feedback.setCurrentStep(37)
         if feedback.isCanceled():
@@ -1148,7 +1010,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             'FORMATTED_VALUES': False,
             'LAYERS': outputs['PreparingTheTableToExportTheParameters']['OUTPUT'],
             'OUTPUT': exportParametersToExcel,
-            'OVERWRITE': False,
+            'OVERWRITE': True,
             'USE_ALIAS': False
         }
         outputs['ExportToSpreadsheet'] = processing.run('native:exporttospreadsheet',
