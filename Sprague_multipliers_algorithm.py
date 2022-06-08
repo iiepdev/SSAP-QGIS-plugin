@@ -152,7 +152,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         #Pre-primary starting age
         param = QgsProcessingParameterNumber(
             'preprimarystartingage',
-            'Pre-primary starting age',
+            'Group 1 starting age / Pre-primary starting age',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
             minValue=2,
@@ -166,7 +166,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Pre-primary duration
         param = QgsProcessingParameterNumber(
             'preprimaryduration',
-            'Pre-primary duration',
+            'Group 1 duration / Pre-primary duration',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
             minValue=1,
@@ -180,7 +180,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Primary starting age
         param = QgsProcessingParameterNumber(
             'primarystartingage',
-            'Primary starting age',
+            'Group 2 starting age / Primary starting age',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
             minValue=5,
@@ -193,7 +193,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Primary duration
         param = QgsProcessingParameterNumber(
             'primaryduration',
-            'Primary duration',
+            'Group 2 duration / Primary duration',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
             minValue=4,
@@ -206,7 +206,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Lower secondary starting age
         param = QgsProcessingParameterNumber(
             'lowersecondarystartingage',
-            'Lower secondary starting age',
+            'Group 3 starting age / Lower secondary starting age',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
             minValue=10,
@@ -219,7 +219,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Lower secondary duration
         param = QgsProcessingParameterNumber(
             'lowersecondaryduration',
-            'Lower secondary duration',
+            'Group 3 duration / Lower secondary duration',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
             minValue=1,
@@ -232,7 +232,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Upper secondary starting age
         param = QgsProcessingParameterNumber(
             'uppersecondarystartingage',
-            'Upper secondary starting age',
+            'Group 4 starting age / Upper secondary starting age',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
             minValue=13,
@@ -245,7 +245,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         # Upper secondary starting age
         param = QgsProcessingParameterNumber(
             'uppersecondaryduration',
-            'Upper secondary duration',
+            'Group 4 duration / Upper secondary duration',
             optional=True,
             type=QgsProcessingParameterNumber.Integer,
             minValue=1,
