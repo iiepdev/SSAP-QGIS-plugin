@@ -1078,7 +1078,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 <h3>ISO country code</h3>
 <p>3-letter ISO country code</p>
 <h3>year</h3>
-<p>year of analysis (e.g. 2014)</p>
+<p>Year of analysis (e.g. 2014)</p>
 <h3>Use unconstrained population estimates</h3>
 <p></p>
 <h3>Use UN adjusted constrained estimates</h3>
@@ -1107,21 +1107,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 <p>This must be a number.</p>
 <h3>Secondary duration</h3>
 <p>This must be a number.</p>
-<h3>Verbose logging</h3>
-<p></p>
-<h3>Results</h3>
-<p>This will only be calculated if the option to create custom school age groups is not selected. It will contain the same information as the Administrative boundaries' polygon layer, plus additional columns for the single years of age by sex.</p>
-<h3>Results with Lower and Upper secondary</h3>
-<p>This will only be created if the option to create custom school age groups and to make a distinction between Lower and Upper secondary is selected. It will create, in addition to the single year of age columns, additional columns by sex for each educational level. </p>
-<h3>Results with Secondary</h3>
-<p>This will only be created if the option to create custom school age groups is selected and the option to make a distinction between Lower and Upper secondary is unselected. It will create, in addition to the single year of age columns, additional columns by sex for each educational level. </p>
 <h2>Outputs</h2>
 <h3>Results</h3>
-<p>This will only be calculated if the option to create custom school age groups is not selected. It will contain the same information as the Administrative boundaries' polygon layer, plus additional columns for the single years of age by sex.</p>
-<h3>Results with Lower and Upper secondary</h3>
-<p>This will only be created if the option to create custom school age groups and to make a distinction between Lower and Upper secondary is selected. It will create, in addition to the single year of age columns, additional columns by sex for each educational level. </p>
-<h3>Results with Secondary</h3>
-<p>This will only be created if the option to create custom school age groups is selected and the option to make a distinction between Lower and Upper secondary is unselected. It will create, in addition to the single year of age columns, additional columns by sex for each educational level. </p>
+<p>It will contain the same information as the Administrative boundaries' polygon layer, plus additional columns for the single years of age by sex. If the option to reconstruct school age groups has been chosen and the parameters added, it should contain additional columns for pre-primary, primary, lower, and upper secondary, for female, male, and total.</p>
 <br><p align="right">Algorithm author: Development unit, IIEP-UNESCO (development@iiep.unesco.org)</p><p align="right">Help author: Development unit, IIEP-UNESCO (development@iiep.unesco.org)</p><p align="right">Algorithm version: 1.0</p></body></html>"""
 
 
