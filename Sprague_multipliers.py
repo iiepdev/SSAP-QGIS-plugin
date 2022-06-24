@@ -62,7 +62,7 @@ class SpragueMultipliersPlugin(object):
     def initGui(self):
       self.initProcessing()
 
-      icon = os.path.join(os.path.join(cmd_folder, 'Sprague logo.svg'))
+      icon = os.path.join(os.path.join(cmd_folder, 'sprague_logo.svg'))
       self.action = QAction(
           QIcon(icon),
           u"Sprague multipliers", self.iface.mainWindow())

@@ -84,7 +84,7 @@ class SpragueMultipliersProvider(QgsProcessingProvider):
         the Processing toolbox.
         """
         cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'IIEP logo.svg')))
+        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'iiep_logo.svg')))
         return icon
 
     def longName(self):

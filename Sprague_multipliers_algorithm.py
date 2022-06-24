@@ -339,7 +339,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             fn = parameters['isoCountryCode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained.tif"
         elif parameters[    'useConstrainedPopulationEstimates'] and parameters['UseUNadjustedconstrainedestimates']:
             fn = parameters['isoCountryCode'].lower() + "_f_0_" + str(parameters['Year']) + "_constrained_UNadj.tif"
-        
+
         alg_params = {
             'COLUMN_PREFIX': 'F_0_',
             'INPUT': parameters['Administrativeboundaries'],
@@ -356,7 +356,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                                                )
 
 
-        feedback.setCurrentStep(1)        
+        feedback.setCurrentStep(1)
 
         genders = ['f', 'm']
         ages = [['0', '1'], ['1', '4'], ['5', '9'], ['10', '14'], ['15', '19'], ['20', '24'], ['25', '29'], ['30', '34'], ['35', '39']]
@@ -404,7 +404,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         for gender in genders:
             for i in range(5,40,5):
-            
+
                 expression_expression = f'\"{gender}_{i}_sum\"'
                 expression_name = f'{gender}_{i}_sum'
 
@@ -422,7 +422,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         field_mapping = field_mapping + extra_expression
 
-        
+
         alg_params = {
             'FIELDS_MAPPING': field_mapping,
             'INPUT': outputs['18']['OUTPUT'],
@@ -435,7 +435,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                                                              is_child_algorithm=True
                                                              )
 
-       
+
 
         feedback.setCurrentStep(21)
         if feedback.isCanceled():
@@ -553,7 +553,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
         field_mapping = []
         genders = ["M", "F"]
-        
+
         for gender in genders:
             for i in range(4,34,5):
 
@@ -586,8 +586,8 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             expression['type']=6
 
             field_mapping.append(expression)
-            
-        
+
+
         alg_params = {
             'FIELDS_MAPPING': field_mapping,
             'INPUT': outputs['CreateSpatialIndexSection1']['OUTPUT'],
@@ -620,8 +620,8 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
             expression['precision']=0
             expression['type']=6
 
-            field_mapping.append(expression)    
-        
+            field_mapping.append(expression)
+
         alg_params = {
             'FIELDS_MAPPING': field_mapping,
             'INPUT': outputs['CalculatingSingleyearsOfAgeSection2']['OUTPUT'],
@@ -745,7 +745,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                 expression['type']=6
 
                 field_mapping.append(expression)
-        
+
         alg_params = {
             'FIELDS_MAPPING': field_mapping,
             'INPUT': outputs['JoinAttributesByLocationSections1Through3']['OUTPUT'],
@@ -830,7 +830,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
                 starting = vars()[level + 'startingage']
                 duration = vars()[level + 'duration']
-                            
+
                 for gender in genders:
 
                     expression_expression = f'eval(array_to_string(array_foreach(generate_series( {starting} ,  {starting} + {duration} - 1),concat(\'Y_{gender}_\',@element)),\'+\'))'
@@ -844,8 +844,8 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                     expression['type']=6
 
 
-                    field_mapping.append(expression) 
-            
+                    field_mapping.append(expression)
+
             alg_params = {
                 'FIELDS_MAPPING': field_mapping,
                 'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
@@ -891,7 +891,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         if not parameters['Createcustomschoolagegroups']:
 
 
-            # Calculating school ages 
+            # Calculating school ages
             genders = ["M", "F", "T"]
             field_mapping = []
             for gender in genders:
@@ -908,7 +908,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
                     expression['type']=6
 
                     field_mapping.append(expression)
-            
+
             alg_params = {
                 'FIELDS_MAPPING': field_mapping,
                 'INPUT': outputs['ReorganizingTheResults']['OUTPUT'],
@@ -1116,7 +1116,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
     def icon(self):
         cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'Sprague logo.svg')))
+        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'sprague_logo.svg')))
         return icon
 
 
