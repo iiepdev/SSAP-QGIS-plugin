@@ -1069,7 +1069,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
     def shortHelpString(self):
         return """<html><body><h2>Algorithm description</h2>
-<p>Test This algorithm aims at creating single years of age for any level of administrative boundaries or any other polygon layer, based on clustered 5-year age group raster files, by applying Sprague multipliers. It also allows the user to reconstruct the different school age groups for a particular country, regardless of whether the system divides lower and upper secondary or not. </p>
+<p>This algorithm aims at creating single years of age for any level of administrative boundaries or any other polygon layer, based on clustered 5-year age group raster files, by applying Sprague multipliers. It also allows the user to reconstruct the different school age groups for a particular country, regardless of whether the system divides lower and upper secondary or not. </p>
 <h2>Input parameters</h2>
 <h3>Folder containing the raster files</h3>
 <p>Select the folder containing the raster files with the 5-year age groups.</p>
@@ -1080,9 +1080,9 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 <h3>Year</h3>
 <p>Year of analysis (e.g. 2014)</p>
 <h3>Use unconstrained population estimates</h3>
-<p></p>
-<h3>Use UN adjusted constrained estimates</h3>
-<p></p>
+<p>As defined by the classification produced by WorldPop</p>
+<h3>Use UN-adjusted constrained estimates</h3>
+<p>As defined by the classification produced by WorldPop</p>
 <h3>Create custom school age groups</h3>
 <p>Select to create custom school age groups for the country or region.</p>
 <h3>Pre-primary starting age</h3>
@@ -1093,8 +1093,6 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 <p>This must be a number.</p>
 <h3>Primary duration</h3>
 <p>This must be a number.</p>
-<h3>System divided in Lower and Upper secondary</h3>
-<p>Select if the education system is divided in Lower and Upper Secondary.</p>
 <h3>Lower secondary starting age</h3>
 <p>This must be a number.</p>
 <h3>Lower secondary duration</h3>
@@ -1103,14 +1101,10 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 <p>This must be a number.</p>
 <h3>Upper secondary duration</h3>
 <p>This must be a number.</p>
-<h3>Secondary starting age</h3>
-<p>This must be a number.</p>
-<h3>Secondary duration</h3>
-<p>This must be a number.</p>
 <h2>Outputs</h2>
 <h3>Results</h3>
 <p>It will contain the same information as the Administrative boundaries' polygon layer, plus additional columns for the single years of age by sex. If the option to reconstruct school age groups has been chosen and the parameters added, it should contain additional columns for pre-primary, primary, lower, and upper secondary, for female, male, and total.</p>
-<br><p align="right">Algorithm author: Development unit, IIEP-UNESCO (development@iiep.unesco.org)</p><p align="right">Help author: Development unit, IIEP-UNESCO (development@iiep.unesco.org)</p><p align="right">Algorithm version: 1.0</p></body></html>"""
+<br><p>Algorithm author: Development unit, IIEP-UNESCO (development@iiep.unesco.org)</p><p>Help author: Development unit, IIEP-UNESCO (development@iiep.unesco.org)</p><p>Algorithm version: 1.0</p></body></html>"""
 
 
 
