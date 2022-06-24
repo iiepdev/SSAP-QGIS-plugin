@@ -35,7 +35,7 @@ import os
 import inspect
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsProcessingProvider
-from .Sprague_multipliers_algorithm import SpragueMultipliersAlgorithm
+from .sprague_multipliers_algorithm import SpragueMultipliersAlgorithm
 
 
 class SpragueMultipliersProvider(QgsProcessingProvider):

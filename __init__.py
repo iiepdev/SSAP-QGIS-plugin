@@ -35,5 +35,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from .Sprague_multipliers import SpragueMultipliersPlugin
+    from .sprague_multipliers import SpragueMultipliersPlugin
     return SpragueMultipliersPlugin(iface)

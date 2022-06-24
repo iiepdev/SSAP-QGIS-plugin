@@ -40,7 +40,7 @@ from qgis.PyQt.QtGui import QIcon
 import processing
 
 from qgis.core import QgsProcessingAlgorithm, QgsApplication
-from .Sprague_multipliers_provider import SpragueMultipliersProvider
+from .sprague_multipliers_provider import SpragueMultipliersProvider
 
 cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
 
