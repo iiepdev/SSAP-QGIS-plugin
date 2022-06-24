@@ -32,10 +32,13 @@ __revision__ = '$Format:%H$'
 
 
 import os
-import inspect
+
 from qgis.PyQt.QtGui import QIcon
 from qgis.core import QgsProcessingProvider
+
 from .sprague_multipliers_algorithm import SpragueMultipliersAlgorithm
+
+
 
 
 class SpragueMultipliersProvider(QgsProcessingProvider):
@@ -83,8 +86,8 @@ class SpragueMultipliersProvider(QgsProcessingProvider):
         Should return a QIcon which is used for your provider inside
         the Processing toolbox.
         """
-        cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'iiep_logo.svg')))
+        plugin_dir = os.path.dirname(__file__)
+        icon = QIcon(os.path.join(plugin_dir, 'img', 'iiep_logo.svg'))
         return icon
 
     def longName(self):

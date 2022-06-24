@@ -17,7 +17,7 @@ hasProcessingProvider=yes
 tags=raster,processing,vector,polygon,calculator,sprague,algorithm
 
 homepage=https://github.com/iiepdev/SSAP-QGIS-plugin
-icon=iiep_logo.svg
+icon=img/iiep_logo.svg
 # experimental flag
 experimental=True
 

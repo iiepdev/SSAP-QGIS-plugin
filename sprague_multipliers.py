@@ -31,8 +31,6 @@ __copyright__ = '(C) 2021 by IIEP-UNESCO'
 __revision__ = '$Format:%H$'
 
 import os
-import sys
-import inspect
 
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
@@ -42,10 +40,7 @@ import processing
 from qgis.core import QgsProcessingAlgorithm, QgsApplication
 from .sprague_multipliers_provider import SpragueMultipliersProvider
 
-cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
 
-if cmd_folder not in sys.path:
-    sys.path.insert(0, cmd_folder)
 
 
 class SpragueMultipliersPlugin(object):
@@ -53,6 +48,7 @@ class SpragueMultipliersPlugin(object):
     def __init__(self, iface):
         self.provider = None
         self.iface = iface
+        self.plugin_dir = os.path.dirname(__file__)
 
     def initProcessing(self):
         """Init Processing provider for QGIS >= 3.8."""
@@ -60,20 +56,20 @@ class SpragueMultipliersPlugin(object):
         QgsApplication.processingRegistry().addProvider(self.provider)
 
     def initGui(self):
-      self.initProcessing()
+        self.initProcessing()
 
-      icon = os.path.join(os.path.join(cmd_folder, 'sprague_logo.svg'))
-      self.action = QAction(
-          QIcon(icon),
-          u"Sprague multipliers", self.iface.mainWindow())
-      self.action.triggered.connect(self.run)
-      self.iface.addPluginToMenu(u"&SpragueMultipliersAlgorithm", self.action)
-      self.iface.addToolBarIcon(self.action)
+        icon = QIcon(os.path.join(self.plugin_dir, 'img', 'sprague_logo.svg'))
+        self.action = QAction(
+            icon,
+            u"Sprague multipliers", self.iface.mainWindow())
+        self.action.triggered.connect(self.run)
+        self.iface.addPluginToMenu(u"&SpragueMultipliersAlgorithm", self.action)
+        self.iface.addToolBarIcon(self.action)
 
     def unload(self):
-      QgsApplication.processingRegistry().removeProvider(self.provider)
-      self.iface.removePluginMenu(u"&SpragueMultipliersAlgorithm", self.action)
-      self.iface.removeToolBarIcon(self.action)
+        QgsApplication.processingRegistry().removeProvider(self.provider)
+        self.iface.removePluginMenu(u"&SpragueMultipliersAlgorithm", self.action)
+        self.iface.removeToolBarIcon(self.action)
 
     def run(self):
-      processing.execAlgorithmDialog("IIEP-UNESCO:Sprague Multipliers")
+        processing.execAlgorithmDialog("IIEP-UNESCO:Sprague Multipliers")

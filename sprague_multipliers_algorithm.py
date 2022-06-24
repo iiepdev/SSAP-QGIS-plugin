@@ -1109,8 +1109,8 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 
 
     def icon(self):
-        cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
-        icon = QIcon(os.path.join(os.path.join(cmd_folder, 'sprague_logo.svg')))
+        plugin_dir = os.path.dirname(__file__)
+        icon = QIcon(os.path.join(plugin_dir, 'img', 'sprague_logo.svg'))
         return icon
 
 
