@@ -1077,7 +1077,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
 <p>Polygon layer containing the administrative boundaries on which the single years of age' variables will be calculated. It can also be any other arrangement (e.g. Voronoi polygons).</p>
 <h3>ISO country code</h3>
 <p>3-letter ISO country code</p>
-<h3>year</h3>
+<h3>Year</h3>
 <p>Year of analysis (e.g. 2014)</p>
 <h3>Use unconstrained population estimates</h3>
 <p></p>
