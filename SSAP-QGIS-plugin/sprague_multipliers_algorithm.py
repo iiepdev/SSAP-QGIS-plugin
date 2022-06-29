@@ -30,7 +30,6 @@ __copyright__ = '(C) 2021 by IIEP-UNESCO'
 
 __revision__ = '$Format:%H$'
 import os
-import inspect
 from qgis.PyQt.QtGui import QIcon
 import processing
 from qgis.core import Qgis
@@ -1038,7 +1037,7 @@ class SpragueMultipliersAlgorithm(QgsProcessingAlgorithm):
         lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         """
-        return 'Sprague Multipliers'
+        return 'Sprague for school age populations'
 
     def displayName(self):
         """

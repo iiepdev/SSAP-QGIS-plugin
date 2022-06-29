@@ -1,10 +1,10 @@
 [general]
-name=Sprague Multipliers for Educational Planning
+name=Sprague for school age populations
 email=development@iiep.unesco.org
 author=IIEP-UNESCO
 qgisMinimumVersion=3.8.0
 qgisMaximumVersion=3.99.99
-description=This plugin generates school-aged populations for any educational levels and any polygon layer
+description=This plugin generates school-age populations for any educational levels and any polygon layer
 about=This algorithm aims at creating single years of age for any level of administrative boundaries or any other polygon layer, based on clustered 5-year age group raster files, by applying Sprague multipliers. It also allows the user to reconstruct the different school age groups for a particular education system.
 version=1.0
 
