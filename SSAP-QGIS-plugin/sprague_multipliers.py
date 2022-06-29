@@ -72,4 +72,4 @@ class SpragueMultipliersPlugin(object):
         self.iface.removeToolBarIcon(self.action)
 
     def run(self):
-        processing.execAlgorithmDialog("IIEP-UNESCO:Sprague Multipliers")
+        processing.execAlgorithmDialog("IIEP-UNESCO:Sprague for school age populations")
